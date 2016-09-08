@@ -1,7 +1,39 @@
+import React from 'react';
+import {render} from 'react-dom';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import SpecTrakDrawer from './components/SpecTrakDrawer'; // Our custom react component
+import SpecificationForm from './components/SpecificationForm'; // Our custom react component
+
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin();
+
+const muiTheme =
+
+// Render the main app react component into the app div.
+// For more details see: https://facebook.github.io/react/docs/top-level-api.html#react.render
+//<SpecTrakDrawer />
+//<div style={ { paddingTop: '64px', minHeight: '400px', paddingLeft: '256px' } }>
+//  <div style={ { margin: '48px 72px' } }>
+//    <SpecificationForm />
+//  </div>
+//</div>
+render(
+  <MuiThemeProvider muiTheme={getMuiTheme({})}>
+    <div style={ { marginLeft:'auto', marginRight:'auto', width: '32em' } }>
+      <SpecificationForm />
+    </div>
+  </MuiThemeProvider>,
+  document.getElementById('app')
+);
+
 /**
  * In this file, we create a React component
  * which incorporates components provided by Material-UI.
  */
+ /*
 import React, {Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
@@ -81,3 +113,4 @@ class Main extends Component {
 }
 
 export default Main;
+*/
