@@ -3,8 +3,9 @@ import {render} from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import SpecTrakDrawer from './components/SpecTrakDrawer'; // Our custom react component
-import SpecificationForm from './components/SpecificationForm'; // Our custom react component
+import SpecTrakDrawer from './SpecTrakDrawer'; // Our custom react component
+import SpecificationForm from './SpecificationForm'; // Our custom react component
+import config from '../../server/config';
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -22,8 +23,8 @@ const muiTheme =
 //</div>
 render(
   <MuiThemeProvider muiTheme={getMuiTheme({})}>
-    <div style={ { marginLeft:'auto', marginRight:'auto', width: '32em' } }>
-      <SpecificationForm />
+    <div style={ { marginLeft:'auto', marginRight:'auto', width: '32em', marginTop:'4em' } }>
+      <SpecificationForm url={config.siteRoot + "api/1/specifications"} />
     </div>
   </MuiThemeProvider>,
   document.getElementById('app')

@@ -5,12 +5,12 @@ const nodeModulesPath = path.resolve(__dirname, 'node_modules');
 const TransferWebpackPlugin = require('transfer-webpack-plugin');
 
 const config = {
-  entry: [path.join(__dirname, '/src/client/Main.js')],
+  entry: [path.join(__dirname, '/src/client/components/App.js')],
   // Render source-map file for final build
   devtool: 'source-map',
   // output config
   output: {
-    path: buildPath, // Path of output file
+    path: path.join(buildPath, 'www'), // Path of output file
     filename: 'app.js', // Name of output file
   },
   plugins: [
@@ -31,7 +31,7 @@ const config = {
     new webpack.NoErrorsPlugin(),
     // Transfer Files
     new TransferWebpackPlugin([
-      {from: 'www'},
+      {from: 'client/static' },
     ], path.resolve(__dirname, 'src')),
   ],
   module: {
