@@ -4,7 +4,7 @@ var debug = !(process.env.NODE_ENV === "release" ||
             process.env.NODE_ENV === "production" ||
             process.argv.includes('--release'));
 
-debug = true;
+debug = false;
 var siteRoot = debug ? '/' : '/spectrak/';
 var deployPath = 'C:\\inetpub\\wwwroot\\spectrak';
 

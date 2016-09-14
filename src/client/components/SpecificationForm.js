@@ -11,6 +11,8 @@ import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
 //import RefreshIndicator from 'material-ui/RefreshIndicator';
 import LinearProgress from 'material-ui/LinearProgress';
+import Chip from 'material-ui/Chip';
+import AutoComplete from 'material-ui/AutoComplete';
 import $ from 'jquery';
 
 class SpecificationForm extends React.Component
@@ -28,6 +30,8 @@ class SpecificationForm extends React.Component
       citationNumber: '',
       regulatedBy: '',
       description: '',
+      regulations: [{ id: 'test', name: 'test' }],
+      availableRegulations: [],
       snackbarOpen: false,
       saving: false,
       disabled: false
@@ -44,6 +48,9 @@ class SpecificationForm extends React.Component
     this.handleCitationNumberChange = this.handleCitationNumberChange.bind(this);
     this.handleRegulatedByChange = this.handleRegulatedByChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
+    this.handleAvailableRegulationsUpdate = this.handleAvailableRegulationsUpdate.bind(this);
+    this.handleAvailableRegulationsNewRequest = this.handleAvailableRegulationsNewRequest.bind(this);
+    this.handleRegulationRequestDelete = this.handleRegulationRequestDelete.bind(this);
 
     this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
     this.handleSnackbarRequestClose = this.handleSnackbarRequestClose.bind(this);
@@ -79,6 +86,34 @@ class SpecificationForm extends React.Component
 
   handleRegulatedByChange(e, key, payload) {
     this.setState({ regulatedBy: payload });
+  };
+
+  handleAvailableRegulationsUpdate(e, v) {
+    this.setState({
+      availableRegulations: [
+          { id: e, name: e },
+          { id: e+e, name: e+e },
+          { id: e+e+e, name: e+e+e }
+      ]
+    });
+  };
+
+  handleAvailableRegulationsNewRequest(chosenRequest, index) {
+    var updatedRegulations = this.state.regulations;
+    if(index < 0) {
+      updatedRegulations.push({name: chosenRequest });
+    } else {
+      updatedRegulations.push(chosenRequest);
+    }
+
+    this.setState({ regulations: updatedRegulations });
+  };
+
+  handleRegulationRequestDelete(key) {
+    this.regulations = this.state.regulations;
+    const regulationToDelete = this.regulations.map((reg) => reg.id).indexOf(key)
+    this.regulations.splice(regulationToDelete, 1);
+    this.setState({ regulation: this.regulations });
   };
 
   handleDescriptionChange(e) {
@@ -135,6 +170,9 @@ class SpecificationForm extends React.Component
   }
 
   render() {
+
+    const availableRegulationsDataSourceConfig = { text: 'name', value: 'id' };
+
     return (
       <Card style={this.props.style}>
         <CardHeader title="Specification Form" showExpandableButton={false} />
@@ -158,6 +196,17 @@ class SpecificationForm extends React.Component
               <MenuItem value="NESC" primaryText="NESC" />
             </SelectField>
             <TextField hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={this.state.description} onChange={this.handleDescriptionChange} />
+            <AutoComplete hintText="reg name" dataSource={this.state.availableRegulations} onUpdateInput={this.handleAvailableRegulationsUpdate} onNewRequest={this.handleAvailableRegulationsNewRequest} floatingLabelText="Add Associated Regulation" dataSourceConfig={availableRegulationsDataSourceConfig} />
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {
+              this.state.regulations.map(function(currentValue, index) {
+                return(
+                  <Chip key={currentValue.id} style={{ margin: 4 }} onRequestDelete={  () => this.handleRegulationRequestDelete(currentValue.id) }>
+                    {currentValue.name}
+                  </Chip>)
+              }, this)
+            }
+            </div>
             <RaisedButton label="Save" primary={true} fullWidth={true} style={ {marginTop:'2em'} } onTouchTap={this.handleSaveButtonClick} disabled={this.state.saving} />
             <LinearProgress mode="indeterminate" style={{display: this.state.saving ? 'block' : 'none' }} />
             <Snackbar open={this.state.snackbarOpen} message="Specification saved" autoHideDuration={4000} onRequestClose={this.handleSnackbarRequestClose} />
@@ -166,10 +215,6 @@ class SpecificationForm extends React.Component
       </Card>
     );
 
-    //<CardActions>
-    //      <FlatButton label="Action1" />
-    //      <FlatButton label="Action2" />
-    //    </CardActions>
   }
 }
 

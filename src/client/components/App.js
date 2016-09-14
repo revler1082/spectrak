@@ -11,8 +11,6 @@ import config from '../../server/config';
 // http://stackoverflow.com/a/34015469/988941
 injectTapEventPlugin();
 
-const muiTheme =
-
 // Render the main app react component into the app div.
 // For more details see: https://facebook.github.io/react/docs/top-level-api.html#react.render
 //<SpecTrakDrawer />
@@ -23,95 +21,9 @@ const muiTheme =
 //</div>
 render(
   <MuiThemeProvider muiTheme={getMuiTheme({})}>
-    <div style={ { marginLeft:'auto', marginRight:'auto', width: '32em', marginTop:'4em' } }>
+    <div style={ { marginLeft:'auto', marginRight:'auto', width: '40em', marginTop:'4em', marginBottom: '4em', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)' } }>
       <SpecificationForm url={config.siteRoot + "api/1/specifications"} />
     </div>
   </MuiThemeProvider>,
   document.getElementById('app')
 );
-
-/**
- * In this file, we create a React component
- * which incorporates components provided by Material-UI.
- */
- /*
-import React, {Component} from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
-import Dialog from 'material-ui/Dialog';
-import {deepOrange500} from 'material-ui/styles/colors';
-import FlatButton from 'material-ui/FlatButton';
-import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
-const styles = {
-  container: {
-    textAlign: 'center',
-    paddingTop: 200,
-  },
-};
-
-const muiTheme = getMuiTheme({
-  palette: {
-    accent1Color: deepOrange500,
-  },
-});
-
-class Main extends Component {
-  constructor(props, context) {
-    super(props, context);
-
-    this.handleRequestClose = this.handleRequestClose.bind(this);
-    this.handleTouchTap = this.handleTouchTap.bind(this);
-
-    this.state = {
-      open: false,
-    };
-  }
-
-  handleRequestClose() {
-    this.setState({
-      open: false,
-    });
-  }
-
-  handleTouchTap() {
-    this.setState({
-      open: true,
-    });
-  }
-
-  render() {
-    const standardActions = (
-      <FlatButton
-        label="Ok"
-        primary={true}
-        onTouchTap={this.handleRequestClose}
-      />
-    );
-
-    return (
-      <MuiThemeProvider muiTheme={muiTheme}>
-        <div style={styles.container}>
-          <Dialog
-            open={this.state.open}
-            title="Super Secret Password"
-            actions={standardActions}
-            onRequestClose={this.handleRequestClose}
-          >
-            1-2-3-4-5
-          </Dialog>
-          <h1>Material-UI</h1>
-          <h2>example project</h2>
-          <RaisedButton
-            label="Super Secret Password"
-            secondary={true}
-            onTouchTap={this.handleTouchTap}
-          />
-        </div>
-      </MuiThemeProvider>
-    );
-  }
-}
-
-export default Main;
-*/

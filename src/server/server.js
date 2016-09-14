@@ -4,6 +4,7 @@ var path = require('path');
 var app = express();
 var apiVersion = 1;
 var config = require('./config');
+var models = require('./routes/' + apiVersion + '/data/models');
 
 app.set('view engine', 'jade');
 
@@ -29,7 +30,7 @@ router.get(config.siteRoot, function(req, res) {
 
 router.route('/specifications')
   .get(require('./routes/' + apiVersion + '/SpecificationRoute').get)
-  .post(require('./routes/' + apiVersion + '/SpecificationRoute').post);  
+  .post(require('./routes/' + apiVersion + '/SpecificationRoute').post);
 
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
@@ -42,8 +43,12 @@ app.use(config.siteRoot + 'api/' + apiVersion, router);
 
 if(!module.parent || !config.debug) {
   var port = process.env.PORT || 3000;
-  app.listen(port, function () {
-    console.log('Magic happens on port ' + port);
+  models.sequelize.sync({ force: true }).then(function () {
+    app.listen(port, function () {
+      console.log('Magic happens on port ' + port);
+    });
+    //server.on('error', onError);
+    //server.on('listening', onListening);
   });
 }
 
