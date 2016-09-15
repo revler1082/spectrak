@@ -7,13 +7,11 @@
     "url": "https://github.com/callemall/material-ui.git"
   },
   "scripts": {
-    "start": "node build/server",
+    "start": "SET NODE_ENV=development && node build/server",
     "start-webpack": "webpack-dev-server --config webpack-dev-server.config.js --progress --inline --colors",
     "build": "webpack --config webpack-production.config.js --progress --colors && xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
-    "build-server": "xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
-    "build-client": "webpack --config webpack-production.config.js --progress --colors",
     "clean": "rmdir /S /Q build",
-    "deploy": "xcopy .\\build\\* C:\\inetpub\\wwwroot\\spectrak /s /i /D /Y"
+    "deploy": "xcopy .\\build\\* C:\\inetpub\\wwwroot\\spectrak /s /i /D /Y && xcopy .\\node_modules\\* C:\\inetpub\\wwwroot\\spectrak\\node_modules /s /i /D /Y"
   },
   "private": true,
   "devDependencies": {
@@ -30,8 +28,10 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
+    "jade": "^1.11.0",
     "jquery": "^3.1.0",
     "material-ui": "^0.15.0",
+    "morgan": "^1.7.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
     "react-tap-event-plugin": "^1.0.0",

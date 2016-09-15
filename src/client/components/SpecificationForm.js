@@ -30,13 +30,30 @@ class SpecificationForm extends React.Component
       citationNumber: '',
       regulatedBy: '',
       description: '',
-      regulations: [{ id: 'test', name: 'test' }],
+      regulations: [],
       availableRegulations: [],
       snackbarOpen: false,
       saving: false,
-      disabled: false
+      disabled: false,
+      regulationSearchXhr: null
     };
 
+    // for debug only..
+    /*
+    this.initialState = {
+      type: 'EO',
+      documentNumber: '10359',
+      title: 'Dion Title',
+      issueDate: new Date(),
+      sectionCode: '123',
+      dwg: true,
+      citationNumber: 'Citation Num',
+      regulatedBy: 'PSC',
+      description: 'Some Description',
+      regulations: [{ id: 1, name: 'Regulation 4' }, { id: 2, name: 'Regulation 1' }],
+      availableRegulations: []
+    };
+    */
     this.state = $.extend({}, this.initialState);
 
     this.handleTypeChange = this.handleTypeChange.bind(this);
@@ -54,6 +71,7 @@ class SpecificationForm extends React.Component
 
     this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
     this.handleSnackbarRequestClose = this.handleSnackbarRequestClose.bind(this);
+
   }
 
   handleTypeChange(e, key, payload) {
@@ -88,25 +106,41 @@ class SpecificationForm extends React.Component
     this.setState({ regulatedBy: payload });
   };
 
-  handleAvailableRegulationsUpdate(e, v) {
-    this.setState({
-      availableRegulations: [
-          { id: e, name: e },
-          { id: e+e, name: e+e },
-          { id: e+e+e, name: e+e+e }
-      ]
-    });
+  handleAvailableRegulationsUpdate(e) {
+    if(this.state.regulationSearchXhr) this.state.regulationSearchXhr.abort();
+
+    if(e.length >= 3) {
+      var xhr = $.ajax({
+        url: this.props.regulationsUrl,
+        context: this,
+        data: { contains: e },
+        dataType: 'json',
+        type: 'GET',
+        success: function(data) {
+          this.setState({availableRegulations: data});
+        }
+      });
+
+      this.setState({regulationSearchXhr: xhr});
+    } else {
+      this.setState({ availableRegulations: [] });
+    }
   };
 
   handleAvailableRegulationsNewRequest(chosenRequest, index) {
     var updatedRegulations = this.state.regulations;
     if(index < 0) {
-      updatedRegulations.push({name: chosenRequest });
+      index = this.state.availableRegulations.findIndex(x=>x.name.toLowerCase() == chosenRequest.toLowerCase());
+      if(index >= 0) {
+        updatedRegulations.push(this.state.availableRegulations[index])
+        this.setState({ regulations: updatedRegulations });
+      } else {
+        alert('You can\'t associate this specification to a regulation that doesn\'t exist in our database')
+      }
     } else {
       updatedRegulations.push(chosenRequest);
+      this.setState({ regulations: updatedRegulations });
     }
-
-    this.setState({ regulations: updatedRegulations });
   };
 
   handleRegulationRequestDelete(key) {
@@ -139,7 +173,8 @@ class SpecificationForm extends React.Component
         hasDwg: this.state.hasDwg,
         citationNumber: this.state.citationNumber,
         regulatedBy: this.state.regulatedBy,
-        description: this.state.description
+        description: this.state.description,
+        regulations: this.state.regulations
       },
       success: function(data) {
         this.setState({
@@ -196,7 +231,7 @@ class SpecificationForm extends React.Component
               <MenuItem value="NESC" primaryText="NESC" />
             </SelectField>
             <TextField hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={this.state.description} onChange={this.handleDescriptionChange} />
-            <AutoComplete hintText="reg name" dataSource={this.state.availableRegulations} onUpdateInput={this.handleAvailableRegulationsUpdate} onNewRequest={this.handleAvailableRegulationsNewRequest} floatingLabelText="Add Associated Regulation" dataSourceConfig={availableRegulationsDataSourceConfig} />
+            <AutoComplete hintText="reg name" dataSource={this.state.availableRegulations} onUpdateInput={this.handleAvailableRegulationsUpdate} onNewRequest={this.handleAvailableRegulationsNewRequest} floatingLabelText="Add Associated Regulation" dataSourceConfig={availableRegulationsDataSourceConfig} filter={AutoComplete.caseInsensitiveFilter} />
             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {
               this.state.regulations.map(function(currentValue, index) {

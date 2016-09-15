@@ -22,7 +22,7 @@ injectTapEventPlugin();
 render(
   <MuiThemeProvider muiTheme={getMuiTheme({})}>
     <div style={ { marginLeft:'auto', marginRight:'auto', width: '40em', marginTop:'4em', marginBottom: '4em', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)' } }>
-      <SpecificationForm url={config.siteRoot + "api/1/specifications"} />
+      <SpecificationForm url={config.siteRoot + "api/1/specifications"} regulationsUrl={config.siteRoot + 'api/1/regulations'} />
     </div>
   </MuiThemeProvider>,
   document.getElementById('app')

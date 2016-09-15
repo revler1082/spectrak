@@ -1,11 +1,9 @@
-var models = require('./models');
+var seq = require('./data/sequelize');
+var models = require('./data/models');
+var express = require('express');
+var router  = express.Router();
 
-module.exports = {
-
-  get: function (req, res) {
-    //if(config.debug) {
-    //  req.headers['x-iisnode-auth_user'] = 'CONED\\AHMETAJD';
-    //}
+router.get('/', function(req, res) {
 
     var opts = {
       include: [
@@ -16,62 +14,22 @@ module.exports = {
       }
     };
 
-    if(req.query.id) {
-      opts.where.id = req.query.id;
+    if(req.query.id) { opts.where.id = req.query.id; }
+
+    if(req.query.contains && req.query.contains.length > 0) {
+      req.query.contains = req.query.contains.replace('%', '');
+      req.query.contains = req.query.contains.toLowerCase();
+      //opts.where.name = { $like: '%' + req.query.contains + '%' };
+      opts.where.name = seq.where(seq.fn('lower', seq.col('name')), 'like', '%' + req.query.contains + '%');
     }
+
+    var limit = 5;
+    if(req.query.limit && !isNaN(req.query.limit)) { limit = req.query.limit; }
+    opts.limit = limit;
 
     models.Regulation.findAll(opts).then(function(specs) {
       res.json(specs);
     });
-  }
-  /*
-  post: function (req, res) {
-    //if(config.debug) {
-    //  req.headers['x-iisnode-auth_user'] = 'CONED\\AHMETAJD';
-    //}
-    setTimeout(function() {
-      seq.transaction( function( t ) {
+});
 
-        return Specification
-          .build({
-            type: req.body.type,
-            documentNumber: req.body.documentNumber,
-            title: req.body.title,
-            issueDate: req.body.issueDate,
-            sectionCode: req.body.sectionCode,
-            hasDwg: req.body.hasDwg,
-            citationNumber: req.body.citationNumber,
-            regulatedBy: req.body.regulatedBy,
-            description: req.body.description
-          })
-          // try to save it ..
-          .save( { transaction: t } )
-          // whoohoo, new request saved ..
-          .then( function( r ) {
-            return r;
-          });
-      // all transactions are a go :)
-      }).then( function( transactionResult ) {
-          //console.log('HELLO');
-          res.json( transactionResult.get( { plain: true } ) );
-      // something went wrong :(
-      }).catch( function( transactionError ) {
-        // something went wrong database side,
-        // not just validation..
-        //if( transactionError instanceof Error ) {
-        //  res.json({
-        //    errors: [{
-        //      message: transactionError.message,
-        //      path: 'system'
-        //    }]
-        //  });
-        //} else { // validation errors..
-          res.json( transactionError );
-        //}
-      });
-    }.bind(this), 2000);
-
-  }
-  */
-
-};
+module.exports = router;
