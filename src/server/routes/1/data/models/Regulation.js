@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
     regulatedBy: { type: DataTypes.STRING(32) },
     citationNumber: { type: DataTypes.STRING(16) },
     isTrainingRequired: { type: DataTypes.BOOLEAN },
-    regulationText: { type: DataTypes.STRING(4) },
+    regulationText: { type: DataTypes.STRING(256) },
     requiredActivity: { type: DataTypes.STRING(1024) }
   }, {
     timestamps: true,

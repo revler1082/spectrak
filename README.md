@@ -10,6 +10,11 @@ cd <project folder>
 npm install
 ```
 
+Then build:
+```sh
+npm run build
+```
+
 Now you can run your local server:
 ```sh
 npm run start

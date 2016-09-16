@@ -1,15 +1,16 @@
 {
-  "name": "material-ui-example-webpack",
-  "version": "0.15.0",
-  "description": "Sample project that uses Material-UI",
+  "name": "spectrak",
+  "version": "0.16.0",
+  "description": "more nonsense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/callemall/material-ui.git"
+    "url": "https://github.com/revler1082/spectrak.git"
   },
   "scripts": {
     "start": "SET NODE_ENV=development && node build/server",
     "start-webpack": "webpack-dev-server --config webpack-dev-server.config.js --progress --inline --colors",
     "build": "webpack --config webpack-production.config.js --progress --colors && xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
+    "build-server": "xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
     "clean": "rmdir /S /Q build",
     "deploy": "xcopy .\\build\\* C:\\inetpub\\wwwroot\\spectrak /s /i /D /Y && xcopy .\\node_modules\\* C:\\inetpub\\wwwroot\\spectrak\\node_modules /s /i /D /Y"
   },

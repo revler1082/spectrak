@@ -80,6 +80,16 @@ class SpecificationForm extends React.Component
 
   handleDocumentNumberChange(e) {
     this.setState({ documentNumber: e.target.value });
+    /*
+    $.ajax({
+      url: this.props.getUrl + '/' + this.state.type + '-' + this.state.documentNumber,
+      dataType: 'json',
+      type: 'GET',
+      success: function(data) {
+        this.setState(data);
+      }
+    });
+    */
   };
 
   handleTitleChange(e) {
@@ -159,7 +169,7 @@ class SpecificationForm extends React.Component
     this.setState({saving: true});
 
     $.ajax({
-      url: this.props.url,
+      url: this.props.postUrl,
       dataType: 'json',
       //type: this.state.id === '' ? 'POST' : 'PUT',
       type: 'POST',
@@ -182,8 +192,9 @@ class SpecificationForm extends React.Component
         });
 
         if(!data.errors) {
-          this.state = $.extend({}, this.initialState);
-          this.setState({ snackbarOpen: true });
+          var state = $.extend({}, this.initialState);
+          state.snackbarOpen = true;
+          this.setState(state);
         } else {
           var errMsg = '';
           data.errors.forEach(function(e) {

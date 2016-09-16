@@ -3,23 +3,22 @@ var models = require('./data/models')
 var express = require('express');
 var router  = express.Router();
 
-router.get('/', function(req, res) {
-  var opts = {
-    include: [
-      // nothing so far..
-    ],
-    where: {
+router.get('/latest/:type-:documentNumber', function(req, res) {
 
-    }
-  };
-
-  if(req.query.id) {
-    opts.where.id = req.query.id;
-  }
-
-  models.Specification.findAll(opts).then(function(specs) {
-    res.json(specs);
-  });
+  models.Specification
+    .findOne({
+      include: [{
+        model: models.Regulation
+      }],
+      where: {
+        type: req.params.type.toUpperCase(),
+        documentNumber: req.params.documentNumber
+      },
+      order: 'id DESC'
+    })
+    .then(function(specs) {
+      res.json(specs);
+    });
 });
 
 router.post('/', function(req, res) {
@@ -38,31 +37,40 @@ router.post('/', function(req, res) {
           hasDwg: req.body.hasDwg,
           citationNumber: req.body.citationNumber,
           regulatedBy: req.body.regulatedBy,
-          description: req.body.description
+          description: req.body.description,
+          createdBy: req.headers['x-iisnode-auth_user']
         })
         // try to save it ..
         .save( { transaction: t } )
         // whoohoo, new spec saved ..
         .then( function( spec ) {
 
-          return models.Regulation.findAll({
-            where: {
-              id: {
-                $in: req.body.regulations.map((currentValue) => currentValue.id)
-              }
-            },
-            transaction: t
-          }).then(function(associatedRegulations) {
-            return spec
-              .setRegulations( associatedRegulations, { transaction: t } )
-              .then(function() {
-                return models.Specification
-                  .findById(spec.get( 'id' ), { transaction: t })
-                  .then(function(finalResult) {
-                    return finalResult
-                  });
+          if(req.body.regulations) {
+            return models.Regulation.findAll({
+              where: {
+                id: {
+                  $in: req.body.regulations.map((currentValue) => currentValue.id)
+                }
+              },
+              transaction: t
+            }).then(function(associatedRegulations) {
+              return spec
+                .setRegulations( associatedRegulations, { transaction: t } )
+                .then(function() {
+                  return models.Specification
+                    .findById(spec.get( 'id' ), { transaction: t })
+                    .then(function(finalResult) {
+                      return finalResult
+                    });
+                });
+            });
+          } else {
+            return models.Specification
+              .findById(spec.get( 'id' ), { transaction: t })
+              .then(function(finalResult) {
+                return finalResult
               });
-          })
+          }
         });
         //.catch(function(err) {
         //  console.log('spec save err');
@@ -76,7 +84,11 @@ router.post('/', function(req, res) {
     // oops, big problem :(
     }).catch( function( transactionError ) {
       console.error(transactionError);
-      res.json({ errors: [{ path: 'system', message: 'an error occurred when attempting to save to the database' }] });
+      if(transactionError.hasOwnProperty('errors')) {
+        res.json(transactionError);
+      } else {
+        res.json({ errors: [{ path: 'system', message: 'an error occurred when attempting to save to the database' }] });
+      }
     });
   }.bind(this), 2000);
 });
