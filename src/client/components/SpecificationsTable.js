@@ -76,7 +76,7 @@ class SpecificationsTable extends React.Component
 
     setTimeout(function() {
       this.state.searchXhr = $.ajax({
-        url: '/api/1/specifications/',
+        url: '/spectrak/api/1/specifications/',
         dataType: 'json',
         type: 'GET',
         data: {

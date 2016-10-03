@@ -24,7 +24,7 @@ module.exports = {
     express: {
       port: process.env.PORT || 3000,
       host: process.env.WEBSITE_HOSTNAME || `localhost:${process.env.PORT || 3000}`,
-      siteRoot: '/'
+      siteRoot: '/spectrak/'
     },
     sequelize: {
       host: 'SQLDEN12R4E01',
