@@ -8,6 +8,8 @@ var models = require('./routes/' + apiVersion + '/data/models');
 var specifications = require('./routes/' + apiVersion + '/SpecificationRoute');
 var regulations = require('./routes/' + apiVersion + '/RegulationRoute');
 
+//import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
+
 // when in dev mode, have a auth-user
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 process.env.NODE_ENV = process.env.NODE_ENV.trim();
@@ -57,12 +59,16 @@ app.use(config.express.siteRoot + 'api/' + apiVersion, router);
 app.use(config.express.siteRoot + 'api/' + apiVersion + '/specifications', specifications);
 app.use(config.express.siteRoot + 'api/' + apiVersion + '/regulations', regulations);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+app.get('/*', function (req, res) {
+  res.sendFile(path.resolve(__dirname, '..', 'build', 'www', 'index.html'));
 });
+
+// catch 404 and forward to error handler
+//app.use(function(req, res, next) {
+//  var err = new Error('Not Found');
+//  err.status = 404;
+//  next(err);
+//});
 
 // error handler
 // no stacktraces leaked to user unless in development environment
@@ -76,7 +82,7 @@ app.use(function(err, req, res, next) {
 
 if(!module.parent || process.env.NODE_ENV === 'production') {
   var port = process.env.PORT || 3000;
-  models.sequelize.sync({ force: config.forceSync }).then(function () {
+  models.sequelize.sync({ force: config.sequelize.forceSync }).then(function () {
     if(config.debug && config.sequelize.forceSync) {
       var testSpecs = models.Specification.bulkCreate(config.sequelize.initialData.specifications);
       var testRegs = models.Regulation.bulkCreate(config.sequelize.initialData.regulations);
@@ -84,7 +90,6 @@ if(!module.parent || process.env.NODE_ENV === 'production') {
         testSpecs,
         testRegs,
         function() {
-          console.log('populated test data');
           app.listen(port, function () {
             console.log('Magic happens on port ' + port);
           });

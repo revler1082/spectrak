@@ -35,7 +35,10 @@ class SpecificationForm extends React.Component
       snackbarOpen: false,
       saving: false,
       disabled: false,
-      regulationSearchXhr: null
+      regulationSearchXhr: null,
+      associatedSpecifications: [],
+      availableSpecifications: [],
+      specificationsSearchXhr: null
     };
 
     // for debug only..
@@ -54,7 +57,7 @@ class SpecificationForm extends React.Component
       availableRegulations: []
     };
     */
-    this.state = $.extend({}, this.initialState);
+    this.state = $.extend({ }, this.initialState, { id: this.props.id });
 
     this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleDocumentNumberChange = this.handleDocumentNumberChange.bind(this);
@@ -68,10 +71,41 @@ class SpecificationForm extends React.Component
     this.handleAvailableRegulationsUpdate = this.handleAvailableRegulationsUpdate.bind(this);
     this.handleAvailableRegulationsNewRequest = this.handleAvailableRegulationsNewRequest.bind(this);
     this.handleRegulationRequestDelete = this.handleRegulationRequestDelete.bind(this);
+    this.handleAvailableSpecificationsUpdate = this.handleAvailableSpecificationsUpdate.bind(this);
+    this.handleAvailableSpecificationsNewRequest = this.handleAvailableSpecificationsNewRequest.bind(this);
+    this.handleAssociatedSpecificationRequestDelete = this.handleAssociatedSpecificationRequestDelete.bind(this);
 
     this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
     this.handleSnackbarRequestClose = this.handleSnackbarRequestClose.bind(this);
 
+    if(this.state.id) {
+      this.handleIdChange(this.state.id);
+    }
+  }
+
+  handleIdChange(newId) {
+    $.ajax({
+      //+ '/' + this.state.type + '-' + this.state.documentNumber
+      url: this.props.getUrl,
+      dataType: 'json',
+      type: 'GET',
+      data: {
+        id: this.state.id,
+        include_regs: true,
+        include_assoc_specs: true,
+        _random: Math.random()
+      },
+      success: function(data) {
+        if(!data.errors) {
+          if(data.rows[0].issueDate) data.rows[0].issueDate = new Date(data.rows[0].issueDate);
+          this.setState(data.rows[0]);
+        } else {
+        }
+      }.bind(this),
+      error: function(xhr, status, err) {
+        console.error(this.props.url, status, err.toString());
+      }.bind(this)
+    });
   }
 
   handleTypeChange(e, key, payload) {
@@ -157,7 +191,56 @@ class SpecificationForm extends React.Component
     this.regulations = this.state.regulations;
     const regulationToDelete = this.regulations.map((reg) => reg.id).indexOf(key)
     this.regulations.splice(regulationToDelete, 1);
-    this.setState({ regulation: this.regulations });
+    this.setState({ regulations: this.regulations });
+  };
+
+  handleAvailableSpecificationsUpdate(e) {
+    if(this.state.specificationsSearchXhr) this.state.specificationsSearchXhr.abort();
+
+    if(e.length >= 3) {
+      var xhr = $.ajax({
+        url: this.props.getUrl,
+        context: this,
+        data: { doc_num: e },
+        dataType: 'json',
+        type: 'GET',
+        success: function(data) {
+          var rows = data.rows;
+          rows.map(function(currentValue, index) {
+              rows[index].name = rows[index].type + '-' + rows[index].documentNumber;
+          });
+
+          this.setState({ availableSpecifications: data.rows });
+        }
+      });
+
+      this.setState({specificationsSearchXhr: xhr});
+    } else {
+      this.setState({ availableSpecifications: [] });
+    }
+  };
+
+  handleAvailableSpecificationsNewRequest(chosenRequest, index) {
+    var updatedAssociatedSpecifications = this.state.associatedSpecifications;
+    if(index < 0) {
+      index = this.state.availableSpecifications.findIndex(x=>x.type + '-' + x.documentNumber.toLowerCase() == chosenRequest.toLowerCase());
+      if(index >= 0) {
+        updatedAssociatedSpecifications.push(this.state.availableSpecifications[index])
+        this.setState({ associatedSpecifications: updatedAssociatedSpecifications });
+      } else {
+        alert('You can\'t associate this specification to a specification that doesn\'t exist in our database')
+      }
+    } else {
+      updatedAssociatedSpecifications.push(chosenRequest);
+      this.setState({ associatedSpecifications: updatedAssociatedSpecifications });
+    }
+  };
+
+  handleAssociatedSpecificationRequestDelete(key) {
+    this.associatedSpecifications = this.state.associatedSpecifications;
+    const associatedSpecificationsToDelete = this.associatedSpecifications.map((spec) => spec.id).indexOf(key)
+    this.associatedSpecifications.splice(associatedSpecificationsToDelete, 1);
+    this.setState({ associatedSpecifications: this.associatedSpecifications });
   };
 
   handleDescriptionChange(e) {
@@ -184,7 +267,8 @@ class SpecificationForm extends React.Component
         citationNumber: this.state.citationNumber,
         regulatedBy: this.state.regulatedBy,
         description: this.state.description,
-        regulations: this.state.regulations
+        regulations: this.state.regulations,
+        associatedSpecifications: this.state.associatedSpecifications
       },
       success: function(data) {
         this.setState({
@@ -218,6 +302,7 @@ class SpecificationForm extends React.Component
   render() {
 
     const availableRegulationsDataSourceConfig = { text: 'name', value: 'id' };
+    const availableSpecificationsDataSourceConfig = { text: 'name', value: 'id' };
 
     return (
       <Card style={this.props.style}>
@@ -253,6 +338,17 @@ class SpecificationForm extends React.Component
               }, this)
             }
             </div>
+            <AutoComplete hintText="Document # (ie 103)" dataSource={this.state.availableSpecifications} onUpdateInput={this.handleAvailableSpecificationsUpdate} onNewRequest={this.handleAvailableSpecificationsNewRequest} floatingLabelText="Add Associated Specifications" dataSourceConfig={availableSpecificationsDataSourceConfig} filter={AutoComplete.caseInsensitiveFilter} />
+            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {
+              this.state.associatedSpecifications.map(function(currentValue, index) {
+                return(
+                  <Chip key={currentValue.id} style={{ margin: 4 }} onRequestDelete={  () => this.handleAssociatedSpecificationRequestDelete(currentValue.id) }>
+                    {currentValue.type + '-' + currentValue.documentNumber}
+                  </Chip>)
+              }, this)
+            }
+            </div>
             <RaisedButton label="Save" primary={true} fullWidth={true} style={ {marginTop:'2em'} } onTouchTap={this.handleSaveButtonClick} disabled={this.state.saving} />
             <LinearProgress mode="indeterminate" style={{display: this.state.saving ? 'block' : 'none' }} />
             <Snackbar open={this.state.snackbarOpen} message="Specification saved" autoHideDuration={4000} onRequestClose={this.handleSnackbarRequestClose} />
@@ -263,5 +359,9 @@ class SpecificationForm extends React.Component
 
   }
 }
+
+SpecificationForm.contextTypes = {
+  router: React.PropTypes.object.isRequired
+};
 
 export default SpecificationForm;

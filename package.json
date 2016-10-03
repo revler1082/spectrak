@@ -7,10 +7,11 @@
     "url": "https://github.com/revler1082/spectrak.git"
   },
   "scripts": {
-    "start": "SET NODE_ENV=development && node build/server",
+    "start": "SET \"NODE_ENV=development\" && node build/server",
     "start-webpack": "webpack-dev-server --config webpack-dev-server.config.js --progress --inline --colors",
-    "build": "webpack --config webpack-production.config.js --progress --colors && xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
+    "build": "webpack --config webpack-development.config.js --progress --colors && xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
     "build-server": "xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
+    "build-production": "webpack --config webpack-production.config.js --progress --colors && xcopy .\\src\\server\\* .\\build\\ /s /i /D /Y",
     "clean": "rmdir /S /Q build",
     "deploy": "xcopy .\\build\\* C:\\inetpub\\wwwroot\\spectrak /s /i /D /Y && xcopy .\\node_modules\\* C:\\inetpub\\wwwroot\\spectrak\\node_modules /s /i /D /Y"
   },
@@ -35,6 +36,7 @@
     "morgan": "^1.7.0",
     "react": "^15.0.1",
     "react-dom": "^15.0.1",
+    "react-router": "^2.8.1",
     "react-tap-event-plugin": "^1.0.0",
     "sequelize": "^3.24.2",
     "tedious": "^1.14.0"

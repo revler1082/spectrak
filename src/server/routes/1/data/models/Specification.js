@@ -77,13 +77,20 @@ module.exports = function(sequelize, DataTypes) {
         len: [1, 128]
       }
     },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      validate: {
+      }
+    }
+    /*,
     updatedBy: {
       type: DataTypes.STRING(128),
       allowNull: true,
       validate: {
         len: [1, 128]
       }
-    }
+    }*/
   }, {
     timestamps: true,
     paranoid: true,
@@ -91,7 +98,8 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: false,
     classMethods: {
       associate: function(models) {
-        Specification.belongsToMany(models.Regulation, { through: 'SpecificationsRegulations' });
+        Specification.belongsToMany(models.Regulation, { as: 'regulations', through: 'SpecificationsRegulations' });
+        Specification.belongsToMany(models.Specification, { as: 'associatedSpecifications', through: 'SpecificationAssociations' })
       }
     }
   });
