@@ -181,14 +181,14 @@ class SpecificationForm extends React.Component
   handleAvailableRegulationsNewRequest(chosenRequest, index) {
     var updatedRegulations = this.state.regulations;
     if(index < 0) {
-      index = this.state.availableRegulations.findIndex(x=>x.name.toLowerCase() == chosenRequest.toLowerCase());
-      if(index >= 0) {
-        updatedRegulations.push(this.state.availableRegulations[index])
-        this.setState({ regulations: updatedRegulations });
-      } else {
-        updatedRegulations.push({ id: -1, name: chosenRequest });
+      //index = this.state.availableRegulations.findIndex(x=>x.name.toLowerCase() == chosenRequest.toLowerCase());
+      //if(index >= 0) {
+      //  updatedRegulations.push(this.state.availableRegulations[index])
+      //  this.setState({ regulations: updatedRegulations });
+      //} else {
+        updatedRegulations.push({ id: -100 * Math.random(), name: chosenRequest });
         this.setState({ regulations: updatedRegulations }); 
-      }
+      //}
     } else {
       updatedRegulations.push(chosenRequest);
       this.setState({ regulations: updatedRegulations });

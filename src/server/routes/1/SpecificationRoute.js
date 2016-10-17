@@ -91,15 +91,36 @@ router.post('/', function(req, res) {
            
         })
         .spread(function(affectedCount, affectedRows) {
-
-          return models.Regulation.findAll({
-            where: {
-              id: {
-                $in: req.body.regulations.map((currentValue) => currentValue.id)
-              }
-            },
-            transaction: t
-          });
+          // fake it till you make it?
+          if(!req.body.regulations) req.body.regulations = [];
+          var notInDbRegs = req.body.regulations
+            .filter((e) => e.id < 0)
+            .forEach(function(currentValue, index) {
+              return {
+                code: currentValue.name, 
+                name: currentValue.name, 
+                shortDescription: currentValue.name, 
+                longDescription: currentValue.name, 
+                regulatedBy: '', 
+                citationNumber: '', 
+                isTrainingRequired: false,
+                regulationText: '', 
+                requiredActivity: ''
+              };
+            });
+          
+          return models.Regulation
+            .bulkCreate(notInDbRegs)
+            .then(function() {
+              return models.Regulation.findAll({
+                where: {
+                  id: {
+                    $in: req.body.regulations.map((currentValue) => currentValue.id)
+                  }
+                },
+                transaction: t
+              });
+            });
         })
         .then(function(associatedRegulations) {
 
