@@ -83,7 +83,7 @@ class SpecificationsTable extends React.Component
           _random: Math.random(),
           limit: this.state.pageSize,
           offset: this.state.currentPage * this.state.pageSize,
-          doc_num: this.state.searchTerm
+          q: this.state.searchTerm
         },
         success: function(data) {
 
@@ -159,7 +159,7 @@ class SpecificationsTable extends React.Component
         <Paper zDepth={2}>
           <Toolbar>
             <ToolbarGroup firstChild={true}>
-              <TextField hintText="Document #" style={{marginLeft:'1em'}} value={this.state.searchTerm} onChange={this.handleSearchTermChange} />
+              <TextField hintText="Document # or Section Code" style={{marginLeft:'1em'}} value={this.state.searchTerm} onChange={this.handleSearchTermChange} />
               <RaisedButton label="Search" onTouchTap={this.handleSearchButtonClick} />
             </ToolbarGroup>
             <ToolbarGroup lastChild={true}>
@@ -199,7 +199,7 @@ class SpecificationsTable extends React.Component
                     <TableRowColumn>{currentValue.citationNumber != null ? currentValue.citationNumber : ""}</TableRowColumn>
 
                     <TableRowColumn>
-                      <Link to={"/specifications/" + currentValue.id + '/update'}>
+                      <Link to={"/spectrak/specifications/" + currentValue.id + '/update'}>
                         <RaisedButton label={ "Edit" } style={{ }} />
                       </Link>
                     </TableRowColumn>

@@ -8,9 +8,14 @@ router.get('/', function(req, res) {
   var include = [];
   var whereClause = { isActive: true };
   if(req.query.id) { whereClause.id = req.query.id; }
-  if(req.query.doc_num) { whereClause.documentNumber = { $like: req.query.doc_num + '%' }; }
   if(req.query.include_regs) { include.push({ model: models.Regulation, as: 'regulations' }); }
   if(req.query.include_assoc_specs) { include.push({ model: models.Specification, as: 'associatedSpecifications' }); }
+  if(req.query.q) { 
+    whereClause['$or'] = [
+      { documentNumber: { $like: '%' + req.query.q + '%' }}, 
+      {sectionCode: { $like: '%' + req.query.q + '%'}}
+    ]; 
+  }
 
   models.Specification
     .findAndCountAll({
@@ -49,6 +54,7 @@ router.post('/', function(req, res) {
 
     seq.transaction( function( t ) {
 
+      var newSpec = null;
       return models.Specification
         .build({
           type: req.body.type,
@@ -66,8 +72,10 @@ router.post('/', function(req, res) {
         // try to save it ..
         .save( { transaction: t } )
         // whoohoo, new spec saved ..
-        .then( function( spec ) {
+        .then( function( spec ) {          
 
+          // make all other records inactive for the same document # - type
+          newSpec = spec;
           return models.Specification.update({
             isActive: false
           }, {
@@ -79,57 +87,48 @@ router.post('/', function(req, res) {
               }
             },
             transaction: t
-          }).spread(function(affectedCount, affectedRows) {
-            if(req.body.regulations) {
-              return models.Regulation.findAll({
-                where: {
-                  id: {
-                    $in: req.body.regulations.map((currentValue) => currentValue.id)
-                  }
-                },
-                transaction: t
-              }).then(function(associatedRegulations) {
-
-                return spec
-                  .setRegulations( associatedRegulations, { transaction: t } )
-                  .then(function() {
-
-                    return models.Specification.findAll({
-                      where: {
-                        id: {
-                          $in: req.body.associatedSpecifications.map((currentValue) => currentValue.id)
-                        }
-                      },
-                      transaction: t
-                    }).then(function(associatedSpecifications) {
-                      return spec
-                        .setAssociatedSpecifications( associatedSpecifications, { transaction: t } )
-                        .then(function() {
-                          return models.Specification
-                            .findById(spec.get( 'id' ), { transaction: t })
-                            .then(function(finalResult) {
-                              return finalResult
-                            });
-                        });
-                    });
-
-                  });
-              });
-            } else {
-              return models.Specification
-                .findById(spec.get( 'id' ), { transaction: t })
-                .then(function(finalResult) {
-                  return finalResult
-                });
-            }
           });
-        });
-        //.catch(function(err) {
-        //  console.log('spec save err');
-        //  console.log(err);
-        //  return err;
-        //});
+           
+        })
+        .spread(function(affectedCount, affectedRows) {
 
+          return models.Regulation.findAll({
+            where: {
+              id: {
+                $in: req.body.regulations.map((currentValue) => currentValue.id)
+              }
+            },
+            transaction: t
+          });
+        })
+        .then(function(associatedRegulations) {
+
+          return newSpec.setRegulations( associatedRegulations, { transaction: t } )
+
+        })
+        .then(function() {
+          return models.Specification.findAll({
+            where: {
+              id: {
+                $in: req.body.associatedSpecifications.map((currentValue) => currentValue.id)
+              }
+            },
+            transaction: t
+          });
+          
+        })
+        .then(function(associatedSpecifications) {
+          return newSpec
+            .setAssociatedSpecifications( associatedSpecifications, { transaction: t } )
+        })
+        .then(function() {
+          return models.Specification
+            .findById(newSpec.get( 'id' ), { transaction: t })
+            .then(function(finalResult) {
+              return finalResult
+            });
+        })
+    
     // all transactions are a go :)
     }).then( function( transactionResult ) {
         res.json( transactionResult.get( { plain: true } ) );
@@ -146,3 +145,4 @@ router.post('/', function(req, res) {
 });
 
 module.exports = router;
+

@@ -48,14 +48,20 @@ class SpecificationFormWrapper extends SpecificationForm
 {
   constructor(props) {
     super(props);
+    
+    this.onSave = this.onSave.bind(this);
+  }
+  
+  onSave(e) {
+    this.props.history.push(config.express.siteRoot);
   }
 
+  //<div style={ { marginLeft:'auto', marginRight:'auto', width: '40em', marginTop:'4em', marginBottom: '4em', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)' } }>
+  //  <Link to={ config.express.siteRoot }><RaisedButton label="Back to Specifications" fullWidth={true} secondary={true} /></Link>
+  //</div>
   render() {
     return (
-      <div style={ { marginLeft:'auto', marginRight:'auto', width: '40em', marginTop:'4em', marginBottom: '4em', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)' } }>
-        <Link to="/"><RaisedButton label="Back to Specifications" fullWidth={true} secondary={true} /></Link>
-        <SpecificationForm id={this.props.params.id} getUrl={config.express.siteRoot + "api/1/specifications"} postUrl={config.express.siteRoot + "api/1/specifications"} regulationsUrl={config.express.siteRoot + 'api/1/regulations'}  />
-      </div>
+      <SpecificationForm id={this.props.params.id} getUrl={config.express.siteRoot + "api/1/specifications"} postUrl={config.express.siteRoot + "api/1/specifications"} regulationsUrl={config.express.siteRoot + 'api/1/regulations'} onSave={this.onSave}  />
     );
   }
 };
