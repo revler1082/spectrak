@@ -10,17 +10,20 @@ import Snackbar from 'material-ui/Snackbar';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
-//import RefreshIndicator from 'material-ui/RefreshIndicator';
 import LinearProgress from 'material-ui/LinearProgress';
 import Chip from 'material-ui/Chip';
 import AutoComplete from 'material-ui/AutoComplete';
 import $ from 'jquery';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import {Tabs, Tab} from 'material-ui/Tabs';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import ContentAdd from 'material-ui/svg-icons/content/add';
 
 class SpecificationForm extends React.Component
 {
   constructor(props) {
     super(props);
+    
     this.initialState = {
       id: '',
       type: '',
@@ -32,35 +35,18 @@ class SpecificationForm extends React.Component
       citationNumber: '',
       regulatedBy: '',
       description: '',
-      regulations: [],
-      availableRegulations: [],
+      AssociatedRegulations: [],
       snackbarOpen: false,
       saving: false,
       disabled: false,
-      regulationSearchXhr: null,
+      //regulationSearchXhr: null,
       associatedSpecifications: [],
       availableSpecifications: [],
       specificationsSearchXhr: null,
       finished: false,
       stepIndex: 0
     };
-
-    // for debug only..
-    /*
-    this.initialState = {
-      type: 'EO',
-      documentNumber: '10359',
-      title: 'Dion Title',
-      issueDate: new Date(),
-      sectionCode: '123',
-      dwg: true,
-      citationNumber: 'Citation Num',
-      regulatedBy: 'PSC',
-      description: 'Some Description',
-      regulations: [{ id: 1, name: 'Regulation 4' }, { id: 2, name: 'Regulation 1' }],
-      availableRegulations: []
-    };
-    */
+    
     this.state = $.extend({ }, this.initialState, { id: this.props.id });
 
     this.handleTypeChange = this.handleTypeChange.bind(this);
@@ -79,6 +65,13 @@ class SpecificationForm extends React.Component
     this.handleAvailableSpecificationsNewRequest = this.handleAvailableSpecificationsNewRequest.bind(this);
     this.handleAssociatedSpecificationRequestDelete = this.handleAssociatedSpecificationRequestDelete.bind(this);
     this.getStepContent = this.getStepContent.bind(this);
+    this.handleAddAssociatedRegulationClick = this.handleAddAssociatedRegulationClick.bind(this);
+    this.handleRemoveAssociatedRegulationClick = this.handleRemoveAssociatedRegulationClick.bind(this);
+    this.handleAddAssociatedRegulationPartClick = this.handleAddAssociatedRegulationPartClick.bind(this);
+    this.handleRemoveAssociatedRegulationPartClick = this.handleRemoveAssociatedRegulationPartClick.bind(this);    
+
+    this.handleAssociatedRegulationPartSectionChange = this.handleAssociatedRegulationPartSectionChange.bind(this);
+    this.handleAssociatedRegulationPartDescriptionChange = this.handleAssociatedRegulationPartDescriptionChange.bind(this);
 
     //this.handleSaveButtonClick = this.handleSaveButtonClick.bind(this);
     this.handlePrev = this.handlePrev.bind(this);
@@ -98,8 +91,9 @@ class SpecificationForm extends React.Component
       type: 'GET',
       data: {
         id: this.state.id,
-        include_regs: true,
-        include_assoc_specs: true,
+        ias: true,
+        iar: true,
+        iarp: true,
         _random: Math.random()
       },
       success: function(data) {
@@ -121,16 +115,6 @@ class SpecificationForm extends React.Component
 
   handleDocumentNumberChange(e) {
     this.setState({ documentNumber: e.target.value });
-    /*
-    $.ajax({
-      url: this.props.getUrl + '/' + this.state.type + '-' + this.state.documentNumber,
-      dataType: 'json',
-      type: 'GET',
-      success: function(data) {
-        this.setState(data);
-      }
-    });
-    */
   };
 
   handleTitleChange(e) {
@@ -149,12 +133,18 @@ class SpecificationForm extends React.Component
     this.setState({ dwg: v });
   };
 
-  handleCitationNumberChange(e) {
-    this.setState({ citationNumber: e.target.value });
+  handleCitationNumberChange(e, arIdx) {
+    var ar = this.state.AssociatedRegulations;    
+    var arv = ar[arIdx];
+    arv.citationNumber = e.target.value;
+    this.setState({ associatedRegulations: ar });
   };
 
-  handleRegulatedByChange(e, key, payload) {
-    this.setState({ regulatedBy: payload });
+  handleRegulatedByChange(e, key, payload, arIdx) {
+    var ar = this.state.AssociatedRegulations;
+    var arv = ar[arIdx];
+    arv.regulatedBy = payload;
+    this.setState({ associatedRegulations: ar });
   };
 
   handleAvailableRegulationsUpdate(e) {
@@ -251,10 +241,71 @@ class SpecificationForm extends React.Component
     this.setState({ associatedSpecifications: this.associatedSpecifications });
   };
 
-  handleDescriptionChange(e) {
-    this.setState({ description: e.target.value });
+  handleDescriptionChange(e, arIdx) {
+    var ar = this.state.AssociatedRegulations;    
+    var arv = ar[arIdx];
+    arv.description = e.target.value;
+    this.setState({ associatedRegulations: ar });
   };
   
+  handleAssociatedRegulationPartSectionChange(e, arIdx, arpIdx) {
+    var ar = this.state.AssociatedRegulations;    
+    var arv = ar[arIdx];
+    arv.AssociatedRegulationParts[arpIdx].section = e.target.value;
+    this.setState({ associatedRegulations: ar });
+  };  
+  
+  handleAssociatedRegulationPartDescriptionChange(e, arIdx, arpIdx) {
+    var ar = this.state.AssociatedRegulations;    
+    var arv = ar[arIdx];
+    arv.AssociatedRegulationParts[arpIdx].description = e.target.value;
+    this.setState({ associatedRegulations: ar });
+  };    
+  
+  handleAddAssociatedRegulationClick(e) {
+    var associatedRegulations = this.state.AssociatedRegulations;
+    //var arCount = associatedRegulations.length;
+    //if(arCount == 0 || associatedRegulations[arCount - 1])
+    associatedRegulations.push({
+      "citationNumber": "",
+      "name": "",
+      "regulatedBy": "",
+      "description": "",
+      "AssociatedRegulationParts": []
+    });
+
+    this.setState({ AssociatedRegulations: associatedRegulations });
+  }
+  
+  handleRemoveAssociatedRegulationClick(arIdx) {
+    if(arIdx > -1) {
+      var associatedRegulations = this.state.AssociatedRegulations;      
+      associatedRegulations.splice(arIdx, 1);
+      this.setState({ AssociatedRegulations: associatedRegulations });
+    }
+  }
+
+  handleAddAssociatedRegulationPartClick(arIdx) {
+    var associatedRegulations = this.state.AssociatedRegulations;
+
+    if(arIdx < associatedRegulations.length) {
+      associatedRegulations[arIdx].AssociatedRegulationParts.push({
+        "section": "",
+        "description": ""
+      });
+    
+      this.setState({ AssociatedRegulations: associatedRegulations });
+    }
+  }
+  
+  handleRemoveAssociatedRegulationPartClick(arIdx, arpIdx) {
+    if(arIdx > -1 && arpIdx > -1) {
+      var associatedRegulations = this.state.AssociatedRegulations;
+      associatedRegulations[arIdx].AssociatedRegulationParts.splice(arpIdx, 1);
+      this.setState({ AssociatedRegulations: associatedRegulations });
+    }
+  }
+    
   handlePrev(e) {
     const {stepIndex} = this.state;
     if (stepIndex > 0) {
@@ -264,7 +315,7 @@ class SpecificationForm extends React.Component
 
   handleNext(e) {
     
-    const {stepIndex} = this.state;
+    const { stepIndex } = this.state;
     
     if(stepIndex == 2) {
       e.preventDefault();
@@ -273,7 +324,6 @@ class SpecificationForm extends React.Component
       $.ajax({
         url: this.props.postUrl,
         dataType: 'json',
-        //type: this.state.id === '' ? 'POST' : 'PUT',
         type: 'POST',
         data: {
           id: this.state.id,
@@ -286,7 +336,7 @@ class SpecificationForm extends React.Component
           citationNumber: this.state.citationNumber,
           regulatedBy: this.state.regulatedBy,
           description: this.state.description,
-          regulations: this.state.regulations,
+          associatedRegulations: this.state.AssociatedRegulations,
           associatedSpecifications: this.state.associatedSpecifications
         },
         success: function(data) {
@@ -310,9 +360,9 @@ class SpecificationForm extends React.Component
             });
             alert(errMsg);
             this.setState({
-              processing:false,
-              stepIndex: stepIndex + 1,
-              finished: stepIndex >= 2
+              processing:false
+              //stepIndex: stepIndex + 1,
+              //finished: stepIndex >= 2
             });
           }
         }.bind(this),
@@ -329,6 +379,9 @@ class SpecificationForm extends React.Component
     }
   }
   
+  /**
+  
+  */
   getStepContent(stepIndex) {
     const availableRegulationsDataSourceConfig = { text: 'name', value: 'id' };
     const availableSpecificationsDataSourceConfig = { text: 'name', value: 'id' };
@@ -363,33 +416,55 @@ class SpecificationForm extends React.Component
         );
         break;
       case 1:
+        //<div style={{ display: 'flex', flexWrap: 'wrap' }}>
         result = (
           <div>
-            <div>
-              <TextField id="citationNumber" hintText="04-M-0159" floatingLabelText="Citation Number" value={this.state.citationNumber} onChange={this.handleCitationNumberChange } />
-            </div>
-            <div>
-              <SelectField value={this.state.regulatedBy} onChange={this.handleRegulatedByChange} floatingLabelText="Regulated By">
-                <MenuItem value="PSC" primaryText="PSC" />
-                <MenuItem value="NESC" primaryText="NESC" />
-              </SelectField>
-            </div>
-            <div>
-              <TextField hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={this.state.description} onChange={this.handleDescriptionChange} />                
-            </div>
-            <div>
-              <AutoComplete hintText="reg name" dataSource={this.state.availableRegulations} onUpdateInput={this.handleAvailableRegulationsUpdate} onNewRequest={this.handleAvailableRegulationsNewRequest} floatingLabelText="Add Associated Regulation" dataSourceConfig={availableRegulationsDataSourceConfig} filter={AutoComplete.caseInsensitiveFilter} />
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-              {
-                this.state.regulations.map(function(currentValue, index) {
-                  return(
-                    <Chip key={currentValue.id} style={{ margin: 4 }} onRequestDelete={  () => this.handleRegulationRequestDelete(currentValue.id) }>
-                      {currentValue.name}
-                    </Chip>)
-                }, this)
-              }
-              </div>
-            </div>
+            <RaisedButton key={ 'ar_add' } label={ 'Add New Associated Regulation' } primary={true} fullWidth={true} onTouchTap={ this.handleAddAssociatedRegulationClick } />                          
+            <Tabs>
+            {
+              this.state.AssociatedRegulations.map(function(ar, arIdx) {
+                return(
+                  <Tab key={ arIdx + '_ar_tab' } label={ ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
+                    <RaisedButton key={ arIdx + '_ar_del' } label={ 'Delete ' + (ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationClick(arIdx) } style={{marginTop:'1em'}} />
+                    <div>
+                      <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } />
+                    </div>
+                    <div>
+                      <SelectField key={arIdx + '_ar_regulated_by'} value={ar.regulatedBy} onChange={ (e, key, payload) => this.handleRegulatedByChange(e, key, payload, arIdx) } floatingLabelText="Regulated By">
+                        <MenuItem value="PSC" primaryText="PSC" />
+                        <MenuItem value="NESC" primaryText="NESC" />
+                      </SelectField>
+                    </div>
+                    <div>
+                      <TextField key={arIdx + '_ar_description'} hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={ar.description} onChange={ (e) => this.handleDescriptionChange(e, arIdx) } />                
+                    </div>
+                    <div style={{marginTop:'1em'}}>
+                      <Paper zDepth={4} style={{width:'90%', marginLeft:'auto', marginRight:'auto'}}>
+                      <RaisedButton key={ arIdx + '_ar_part_add' } label={ 'Add Regulation Part' } primary={true} fullWidth={true} onTouchTap={ () => this.handleAddAssociatedRegulationPartClick(arIdx) }/>
+                      <Tabs style={{paddingLeft:'1em', marginTop:'1em', paddingRight:'1em'}}>
+                      {
+                          ar.AssociatedRegulationParts.map(function(arp, arpIdx) {
+                            return(                                                  
+                              <Tab key={arIdx + '_ar_' + arpIdx + '_arp_tab'} label = {arp.section.length > 0 ? arp.section : 'Part ' + (arpIdx + 1)} style={{paddingLeft:'1em', paddingRight:'1em', backgroundColor:'orange'}}>
+                                <RaisedButton label={ 'Delete ' + (arp.section.length > 0 ? arp.section : 'Part ' + (arpIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationPartClick(arIdx, arpIdx) } style={{marginTop:'1em'}} />
+                                <div>
+                                  <TextField key={arIdx + '_ar_' + arpIdx + '_arp_section'} hintText="4.1" floatingLabelText="Section" value={arp.section} onChange={ (e) => this.handleAssociatedRegulationPartSectionChange(e, arIdx, arpIdx) } />
+                                </div>
+                                <div>
+                                  <TextField key={arIdx + '_ar_' + arpIdx + '_arp_description'} hintText="Lorem Ipsum" floatingLabelText="Description" value={arp.description} onChange={ (e) => this.handleAssociatedRegulationPartDescriptionChange(e, arIdx, arpIdx) }  />
+                                </div>
+                              </Tab>
+                            )
+                          }, this)
+                      }
+                      </Tabs>
+                      </Paper>
+                    </div>
+                  </Tab>
+                )
+              }, this)
+            }
+            </Tabs>
           </div>
         );
         break;

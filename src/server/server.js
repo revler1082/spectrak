@@ -85,10 +85,13 @@ if(!module.parent || process.env.NODE_ENV === 'production') {
   models.sequelize.sync({ force: config.sequelize.forceSync }).then(function () {
     if(config.debug && config.sequelize.forceSync) {
       var testSpecs = models.Specification.bulkCreate(config.sequelize.initialData.specifications);
-      var testRegs = models.Regulation.bulkCreate(config.sequelize.initialData.regulations);
+      var testRegs = models.AssociatedRegulation.bulkCreate(config.sequelize.initialData.associatedRegulations);
+      var testRegParts = models.AssociatedRegulationPart.bulkCreate(config.sequelize.initialData.associatedRegulationParts);
+      //var testSpecAssocs = models.associatedSpecification.bulkCreate(config.sequelize.initialData.specificationAssociations);
+            
       bluebird.join(
         testSpecs,
-        testRegs,
+        //testRegs,
         function() {
           app.listen(port, function () {
             console.log('Magic happens on port ' + port);

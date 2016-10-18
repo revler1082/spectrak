@@ -26,12 +26,6 @@ class App extends React.Component
   }
 
   render() {
-    //<SpecTrakDrawer />
-
-    //  <SpecificationForm getUrl={config.express.siteRoot + "api/1/specifications/latest"} postUrl={config.express.siteRoot + "api/1/specifications"} regulationsUrl={config.express.siteRoot + 'api/1/regulations'} />
-    //</div>
-    //        {this.props.children}
-
     return (
       <MuiThemeProvider muiTheme={getMuiTheme({})}>
         {this.props.children}

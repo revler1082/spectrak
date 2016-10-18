@@ -9,7 +9,6 @@ import {Toolbar, ToolbarGroup, ToolbarSeparator, ToolbarTitle} from 'material-ui
 import $ from 'jquery';
 import { Link } from 'react-router';
 import Paper from 'material-ui/Paper';
-import {BottomNavigation, BottomNavigationItem} from 'material-ui/BottomNavigation';
 
 import configs from '../../server/config';
 var config = configs["development"];
@@ -130,31 +129,9 @@ class SpecificationsTable extends React.Component
   }
 
   render() {
-    /*
-
-    */
 
     const totalPages = Math.ceil(this.state.totalCount / this.state.pageSize);
 
-    /*
-    var a = [];
-    for(var i = 0; i < 100; ++i) {
-      a.push({id: i, type:'EO'});
-    }
-    this.state.rows = a;
-    */
-/*
-    if ( this.state.processing ) {
-      return (
-        <div style={{textAlign:"center", marginTop:'2em'}}>
-          <CircularProgress size={2} />
-        </div>
-      )
-    } else {
-    style={{display: this.state.processing ? 'none' : 'block'}}
-{currentValue.hasDwg != null ? currentValue.hasDwg : ""}
-{currentValue.issueDate != null ? currentValue.issueDate : ""}
-    */
       return (
         <Paper zDepth={2}>
           <Toolbar>
@@ -190,7 +167,7 @@ class SpecificationsTable extends React.Component
               this.state.rows.map(function(currentValue, index) {
                 return (
                   <TableRow key={currentValue.id}>
-                    <TableRowColumn>{currentValue.id}</TableRowColumn>
+                    <TableRowColumn>{currentValue.type}</TableRowColumn>
                     <TableRowColumn>{currentValue.documentNumber}</TableRowColumn>
                     <TableRowColumn>{currentValue.title != null ? currentValue.title : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.issueDate != null ? currentValue.issueDate.toString() : ""}</TableRowColumn>

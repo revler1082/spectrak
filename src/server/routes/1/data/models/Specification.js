@@ -42,32 +42,17 @@ module.exports = function(sequelize, DataTypes) {
         len: [1,4]
       }
     },
+    subSectionCode: {
+      type: DataTypes.STRING(4),
+      allowNull: true,
+      validate: {
+        len: [1,4]
+      }
+    },
     hasDwg: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       validate: {
-      }
-    },
-    citationNumber: {
-      type: DataTypes.STRING(16),
-      allowNull: false,
-      validate: {
-        len: [1, 16]
-      }
-    },
-    regulatedBy: {
-      type: DataTypes.STRING(4),
-      allowNull: false,
-      validate: {
-        isIn: [['PSC', 'NESC']],
-        len: [1, 4]
-      }
-    },
-    description: {
-      type: DataTypes.STRING(1024),
-      allowNull: false,
-      validate: {
-        len: [1, 1024]
       }
     },
     createdBy: {
@@ -83,14 +68,6 @@ module.exports = function(sequelize, DataTypes) {
       validate: {
       }
     }
-    /*,
-    updatedBy: {
-      type: DataTypes.STRING(128),
-      allowNull: true,
-      validate: {
-        len: [1, 128]
-      }
-    }*/
   }, {
     timestamps: true,
     paranoid: true,
@@ -98,8 +75,9 @@ module.exports = function(sequelize, DataTypes) {
     freezeTableName: false,
     classMethods: {
       associate: function(models) {
-        Specification.belongsToMany(models.Regulation, { as: 'regulations', through: 'SpecificationsRegulations' });
-        Specification.belongsToMany(models.Specification, { as: 'associatedSpecifications', through: 'SpecificationAssociations' })
+        //Specification.belongsToMany(models.Regulation, { as: 'regulations', through: 'SpecificationsRegulations' });
+        Specification.hasMany(models.AssociatedRegulation, { foreignKey: 'specificationId' });
+        Specification.belongsToMany(models.Specification, { as: 'associatedSpecifications', through: 'SpecificationAssociations', foreignKey: 'specificationId' });
       }
     }
   });
