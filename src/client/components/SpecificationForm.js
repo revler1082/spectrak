@@ -14,24 +14,43 @@ import LinearProgress from 'material-ui/LinearProgress';
 import Chip from 'material-ui/Chip';
 import AutoComplete from 'material-ui/AutoComplete';
 import $ from 'jquery';
-import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import { Step, Stepper, StepLabel, StepButton, StepContent } from 'material-ui/Stepper';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
+/**
+
+*/
 class SpecificationForm extends React.Component
 {
+  /**
+  
+  */
   constructor(props) {
     super(props);
     
     this.initialState = {
       id: '',
+      
+      // spec data 1
       type: '',
       documentNumber: '',
       title: '',
       issueDate: null,
       sectionCode: '',
-      dwg: false,
+      subSectionCode: '',
+      hasDwg: false,
+      
+      // spec data 2
+      author: '',
+      reviewedBy: '',
+      tlcCourse: '',
+      ceRequirements: '',
+      whoNeedsToComply: '',
+      parentSpecification: '',
+      comments: '',
+      
       citationNumber: '',
       regulatedBy: '',
       description: '',
@@ -44,23 +63,29 @@ class SpecificationForm extends React.Component
       availableSpecifications: [],
       specificationsSearchXhr: null,
       finished: false,
-      stepIndex: 0
+      specInfoStepIndex: 0,
+      stepIndex: 0 // overall form
     };
     
     this.state = $.extend({ }, this.initialState, { id: this.props.id });
 
+    // basic specification data handlers..
     this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleDocumentNumberChange = this.handleDocumentNumberChange.bind(this);
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleIssueDateChange = this.handleIssueDateChange.bind(this);
     this.handleSectionCodeChange = this.handleSectionCodeChange.bind(this);
+    this.handleSubSectionCodeChange = this.handleSubSectionCodeChange.bind(this);    
     this.handleDwgToggle = this.handleDwgToggle.bind(this);
+    
+    // regulation data handlers ...
     this.handleCitationNumberChange = this.handleCitationNumberChange.bind(this);
     this.handleRegulatedByChange = this.handleRegulatedByChange.bind(this);
     this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-    this.handleAvailableRegulationsUpdate = this.handleAvailableRegulationsUpdate.bind(this);
-    this.handleAvailableRegulationsNewRequest = this.handleAvailableRegulationsNewRequest.bind(this);
-    this.handleRegulationRequestDelete = this.handleRegulationRequestDelete.bind(this);
+    //this.handleAvailableRegulationsUpdate = this.handleAvailableRegulationsUpdate.bind(this);
+    //this.handleAvailableRegulationsNewRequest = this.handleAvailableRegulationsNewRequest.bind(this);
+    //this.handleRegulationRequestDelete = this.handleRegulationRequestDelete.bind(this);
+    
     this.handleAvailableSpecificationsUpdate = this.handleAvailableSpecificationsUpdate.bind(this);
     this.handleAvailableSpecificationsNewRequest = this.handleAvailableSpecificationsNewRequest.bind(this);
     this.handleAssociatedSpecificationRequestDelete = this.handleAssociatedSpecificationRequestDelete.bind(this);
@@ -98,8 +123,27 @@ class SpecificationForm extends React.Component
       },
       success: function(data) {
         if(!data.errors) {
-          if(data.rows[0].issueDate) data.rows[0].issueDate = new Date(data.rows[0].issueDate);
-          this.setState(data.rows[0]);
+          var record = data.rows[0];
+          //if(data.rows[0].issueDate) data.rows[0].issueDate = new Date(data.rows[0].issueDate);
+          //this.setState(data.rows[0]);
+          this.setState({
+            type: record.type,
+            documentNumber: record.documentNumber,
+            title: record.title || '',
+            issueDate: new Date(record.issueDate) || '',
+            sectionCode: record.sectionCode || '',
+            subSectionCode: record.subSectionCode || '',
+            hasDwg: record.hasDwg || '',
+            author: record.author || '',
+            reviewedBy: record.reviewedBy || '',
+            tlcCourse: record.tlcCourse || '',
+            ceRequirements: record.ceRequirements || '',
+            whoNeedsToComply: record.whoNeedsToComply || '',
+            parentSpecification: record.parentSpecification || '',
+            comments: record.comments || '',
+            AssociatedRegulations: record.AssociatedRegulations === null ? [] : record.AssociatedRegulations,
+            associatedSpecifications: record.associatedSpecifications === null ? [] : record.associatedSpecifications          
+          });
         } else {
         }
       }.bind(this),
@@ -109,28 +153,53 @@ class SpecificationForm extends React.Component
     });
   }
 
+  /**
+  
+  */
   handleTypeChange(e, key, payload) {
     this.setState({ type: payload });
   };
 
+  /**
+  
+  */
   handleDocumentNumberChange(e) {
     this.setState({ documentNumber: e.target.value });
   };
-
+  
+  /**
+  
+  */
   handleTitleChange(e) {
     this.setState({ title: e.target.value });
   };
-
+  
+  /**
+  
+  */
   handleIssueDateChange(e, d) {
     this.setState({ issueDate: d });
   };
 
+  /**
+  
+  */
   handleSectionCodeChange(e) {
     this.setState({ sectionCode: e.target.value });
   };
+  
+  /**
+  
+  */
+  handleSubSectionCodeChange(e) {
+    this.setState({ subSectionCode: e.target.value });
+  };  
 
+  /**
+  
+  */
   handleDwgToggle(e, v) {
-    this.setState({ dwg: v });
+    this.setState({ hasDwg: v });
   };
 
   handleCitationNumberChange(e, arIdx) {
@@ -147,53 +216,12 @@ class SpecificationForm extends React.Component
     this.setState({ associatedRegulations: ar });
   };
 
-  handleAvailableRegulationsUpdate(e) {
-    if(this.state.regulationSearchXhr) this.state.regulationSearchXhr.abort();
-
-    if(e.length >= 3) {
-      var xhr = $.ajax({
-        url: this.props.regulationsUrl,
-        context: this,
-        data: { contains: e },
-        dataType: 'json',
-        type: 'GET',
-        success: function(data) {
-          this.setState({availableRegulations: data});
-        }
-      });
-
-      this.setState({regulationSearchXhr: xhr});
-    } else {
-      this.setState({ availableRegulations: [] });
-    }
-  };
-
-  handleAvailableRegulationsNewRequest(chosenRequest, index) {
-    var updatedRegulations = this.state.regulations;
-    if(index < 0) {
-      //index = this.state.availableRegulations.findIndex(x=>x.name.toLowerCase() == chosenRequest.toLowerCase());
-      //if(index >= 0) {
-      //  updatedRegulations.push(this.state.availableRegulations[index])
-      //  this.setState({ regulations: updatedRegulations });
-      //} else {
-        updatedRegulations.push({ id: -100 * Math.random(), name: chosenRequest });
-        this.setState({ regulations: updatedRegulations }); 
-      //}
-    } else {
-      updatedRegulations.push(chosenRequest);
-      this.setState({ regulations: updatedRegulations });
-    }
-  };
-
-  handleRegulationRequestDelete(key) {
-    this.regulations = this.state.regulations;
-    const regulationToDelete = this.regulations.map((reg) => reg.id).indexOf(key)
-    this.regulations.splice(regulationToDelete, 1);
-    this.setState({ regulations: this.regulations });
-  };
-
+  /**
+  
+  */
   handleAvailableSpecificationsUpdate(e) {
-    if(this.state.specificationsSearchXhr) this.state.specificationsSearchXhr.abort();
+    if(this.state.specificationsSearchXhr) 
+      this.state.specificationsSearchXhr.abort();
 
     if(e.length >= 3) {
       var xhr = $.ajax({
@@ -218,6 +246,9 @@ class SpecificationForm extends React.Component
     }
   };
 
+  /**
+  
+  */
   handleAvailableSpecificationsNewRequest(chosenRequest, index) {
     var updatedAssociatedSpecifications = this.state.associatedSpecifications;
     if(index < 0) {
@@ -234,6 +265,9 @@ class SpecificationForm extends React.Component
     }
   };
 
+  /**
+  
+  */
   handleAssociatedSpecificationRequestDelete(key) {
     this.associatedSpecifications = this.state.associatedSpecifications;
     const associatedSpecificationsToDelete = this.associatedSpecifications.map((spec) => spec.id).indexOf(key)
@@ -333,9 +367,16 @@ class SpecificationForm extends React.Component
           issueDate: this.state.issueDate,
           sectionCode: this.state.sectionCode,
           hasDwg: this.state.hasDwg,
-          citationNumber: this.state.citationNumber,
-          regulatedBy: this.state.regulatedBy,
-          description: this.state.description,
+          author: this.state.author,
+          reviewedBy: this.state.reviewedBy,
+          tlcCourse: this.state.tlcCourse,
+          ceRequirements: this.state.ceRequirements,
+          whoNeedsToComply: this.state.whoNeedsToComply,
+          parentSpecification: this.state.parentSpecification,
+          comments: this.state.comments,
+          //citationNumber: this.state.citationNumber,
+          //regulatedBy: this.state.regulatedBy,
+          //description: this.state.description,
           associatedRegulations: this.state.AssociatedRegulations,
           associatedSpecifications: this.state.associatedSpecifications
         },
@@ -390,28 +431,56 @@ class SpecificationForm extends React.Component
       case 0:
         result = (
           <div>
-            <div>
-              <SelectField value={this.state.type} onChange={this.handleTypeChange} floatingLabelText="Type">
-                <MenuItem value="EO" primaryText="EO" />
-                <MenuItem value="EOP" primaryText="EOP" />
-                <MenuItem value="B" primaryText="B" />
-              </SelectField>
-            </div>
-            <div>
-              <TextField id="documentNumber" hintText="10359" floatingLabelText="Document Number" onChange={ this.handleDocumentNumberChange } value={this.state.documentNumber} />
-            </div>
-            <div>
-              <TextField id="title" hintText="10359" floatingLabelText="Title" onChange={ this.handleTitleChange } value={this.state.title} />
-            </div>
-            <div>
-              <DatePicker id="issueDate" hintText="Issue Date" floatingLabelText="Issue Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
-            </div>
-            <div>
-              <TextField id="sectionCode" hintText="123" floatingLabelText="Section Code" value={this.state.sectionCode} onChange={this.handleSectionCodeChange } />
-            </div>
-            <div>
-              <Toggle id="dwg" label="DWG?" value={this.state.dwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
-            </div>
+            <Paper style={{ width: '48%', float: 'left', padding: '1em' }} zDepth={3}>
+              <div>
+                <SelectField value={this.state.type} onChange={this.handleTypeChange} floatingLabelText="Type">
+                  <MenuItem value="EO" primaryText="EO" />
+                  <MenuItem value="EOP" primaryText="EOP" />
+                  <MenuItem value="B" primaryText="B" />
+                </SelectField>
+              </div>
+              <div>
+                <TextField id="documentNumber" hintText="10359" floatingLabelText="Document Number" onChange={ this.handleDocumentNumberChange } value={this.state.documentNumber} maxLength="8" />
+              </div>
+              <div>
+                <TextField id="title" hintText="10359" floatingLabelText="Title" onChange={ this.handleTitleChange } value={this.state.title} maxLength="128" />
+              </div>
+              <div>
+                <DatePicker id="issueDate" hintText="Issue Date" floatingLabelText="Issue Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
+              </div>
+              <div>
+                <TextField id="sectionCode" hintText="123" floatingLabelText="Section Code" value={this.state.sectionCode} onChange={this.handleSectionCodeChange } maxLength="4" />
+              </div>
+              <div>
+                <TextField id="sub_section_code" hintText="456" floatingLabelText="Sub-Section Code" value={this.state.subSectionCode} onChange={this.handleSubSectionCodeChange } maxLength="4" />
+              </div>                  
+              <div>
+                <Toggle id="dwg" label="Has Drawing?" value={this.state.hasDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
+              </div>
+              </Paper>
+            <Paper style={{width:'48%', marginLeft:'52%', padding: '1em'}} zDepth={3}>
+              <div>
+                <TextField id="author" hintText="Dion Ahmetaj" floatingLabelText="Author" onChange={ (e) => this.setState({ author: e.target.value }) } value={this.state.author} maxLength="128" />
+              </div>
+              <div>
+                <TextField id="reviewed_by" hintText="Dion Ahmetaj" floatingLabelText="Reviewed By" onChange={ (e) => this.setState({ reviewedBy: e.target.value }) } value={this.state.reviewedBy} maxLength="128" />
+              </div>
+              <div>
+                <TextField id="tlc_course" hintText="ABC123" floatingLabelText="TLC Course" onChange={ (e) => this.setState({ tlcCourse: e.target.value }) } value={this.state.tlcCourse} maxLength="16" />
+              </div>
+              <div>
+                <TextField id="ce_requirements" hintText="Statement of CE requirements" floatingLabelText="CE Requirements" multiLine={true} rows={2} onChange={ (e) => this.setState({ ceRequirements: e.target.value }) } value={this.state.ceRequirements} maxLength="1024" />
+              </div>
+              <div>
+                <TextField id="who_needs_to_comply" hintText="Who needs to comply?" floatingLabelText="Compliance People" multiLine={true} rows={2} onChange={ (e) => this.setState({ whoNeedsToComply: e.target.value }) } value={this.state.whoNeedsToComply} maxLength="256" />
+              </div>
+              <div>
+                <TextField id="parent_spec" hintText="EO10359" floatingLabelText="Parent Specification" onChange={ (e) => this.setState({ parentSpecification: e.target.value }) } value={this.state.parentSpecification} maxLength="16" />
+              </div>
+              <div>
+                <TextField id="spec_comments" hintText="" floatingLabelText="Comments" multiLine={true} rows={2} onChange={ (e) => this.setState({ comments: e.target.value }) } value={this.state.comments} maxLength="1024" />
+              </div>              
+            </Paper>
           </div>
         );
         break;
@@ -427,7 +496,7 @@ class SpecificationForm extends React.Component
                   <Tab key={ arIdx + '_ar_tab' } label={ ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
                     <RaisedButton key={ arIdx + '_ar_del' } label={ 'Delete ' + (ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationClick(arIdx) } style={{marginTop:'1em'}} />
                     <div>
-                      <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } />
+                      <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } maxLength="16" />
                     </div>
                     <div>
                       <SelectField key={arIdx + '_ar_regulated_by'} value={ar.regulatedBy} onChange={ (e, key, payload) => this.handleRegulatedByChange(e, key, payload, arIdx) } floatingLabelText="Regulated By">
@@ -436,8 +505,23 @@ class SpecificationForm extends React.Component
                       </SelectField>
                     </div>
                     <div>
-                      <TextField key={arIdx + '_ar_description'} hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={ar.description} onChange={ (e) => this.handleDescriptionChange(e, arIdx) } />                
+                      <TextField key={arIdx + '_ar_name'} hintText="Regulation Name" floatingLabelText="Name" value={ar.name} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].name = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); }  } maxLength="32" />
                     </div>
+                    <div>
+                      <TextField key={arIdx + '_ar_description'} hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={ar.description} onChange={ (e) => this.handleDescriptionChange(e, arIdx) } maxLength="1024" />
+                    </div>
+                    <div>
+                      <Toggle key={arIdx + '_ar_is_training_req'} label="Is Training Required?" value={ar.isTrainingRequired} onToggle={ (e, v) => { this.state.AssociatedRegulations[arIdx].isTrainingRequired = v; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations })} } style={{marginTop:16}} style={{width:''}} />
+                    </div>
+                    <div>
+                      <TextField key={arIdx + '_ar_order_text'} hintText="Regulatory or Order Text" floatingLabelText="Order Text" multiLine={true} rows={2} value={ar.orderText} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].orderText = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="256" />
+                    </div>
+                    <div>
+                      <TextField key={arIdx + '_ar_activity_description'} hintText="Description of required/prohibited activity?" floatingLabelText="Activty Description" multiLine={true} rows={2} value={ar.activityDescription} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].activityDescription = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="256" />
+                    </div>
+                    <div>
+                      <TextField key={arIdx + '_ar_compliance_action'} hintText="How might compliance action/problem occur?" floatingLabelText="Compliance Action" multiLine={true} rows={2} value={ar.complianceAction} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].complianceAction = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="256" />
+                    </div>                                                            
                     <div style={{marginTop:'1em'}}>
                       <Paper zDepth={4} style={{width:'90%', marginLeft:'auto', marginRight:'auto'}}>
                       <RaisedButton key={ arIdx + '_ar_part_add' } label={ 'Add Regulation Part' } primary={true} fullWidth={true} onTouchTap={ () => this.handleAddAssociatedRegulationPartClick(arIdx) }/>
@@ -520,8 +604,7 @@ class SpecificationForm extends React.Component
           {this.getStepContent(stepIndex)}
           <Divider style={{marginTop: '2em', marginBottom:'2em'}} />
           <FlatButton label="Back" disabled={stepIndex === 0} onTouchTap={this.handlePrev} style={{marginRight: 12}} />
-          <RaisedButton label={stepIndex === 2 ? 'Finish' : 'Next'} primary={true} onTouchTap={this.handleNext} disabled={this.state.saving} />
-          
+          <RaisedButton label={stepIndex === 2 ? 'Finish' : 'Next'} primary={true} onTouchTap={this.handleNext} disabled={this.state.saving} />          
           <LinearProgress mode="indeterminate" style={{display: this.state.saving ? 'block' : 'none', marginTop:'2em' }} />
           <Snackbar open={this.state.snackbarOpen} message="Specification saved" autoHideDuration={4000} onRequestClose={this.handleSnackbarRequestClose} />
         </form>

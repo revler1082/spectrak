@@ -4,7 +4,12 @@ module.exports = function(sequelize, DataTypes) {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     citationNumber: { type: DataTypes.STRING(16) },
     regulatedBy: { type: DataTypes.STRING(4) },
-    description: { type: DataTypes.STRING(1024) }
+    name: { type: DataTypes.STRING(32) },
+    description: { type: DataTypes.STRING(1024) },
+    isTrainingRequired: { type: DataTypes.BOOLEAN, allowNull: true },
+    orderText: { type: DataTypes.STRING(256), allowNull: true },
+    activityDescription: { type: DataTypes.STRING(256), allowNull: true },
+    complianceAction: { type: DataTypes.STRING(256), allowNull: true }    
   }, {
     timestamps: true,
     paranoid: true,

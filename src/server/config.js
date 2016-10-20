@@ -9,7 +9,7 @@ module.exports = {
       siteRoot: '/spectrak/'
     },
     sequelize: {
-      host: 'SQLDEN12R4E01',
+      host: 'DISENGSQLPR1',
       database: 'FIS_CONED',
       username: 'netstorm_ro',
       password: 'netstorm_ro',

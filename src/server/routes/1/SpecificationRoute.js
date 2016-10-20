@@ -70,7 +70,14 @@ router.post('/', function(req, res) {
           subSectionCode: req.body.sectionCode,
           hasDwg: req.body.hasDwg,
           createdBy: req.headers['x-iisnode-auth_user'],
-          isActive: true
+          isActive: true,
+          author: req.body.author,
+          reviewedBy: req.body.reviewedBy,
+          tlcCourse: req.body.tlcCourse,
+          ceRequirements: req.body.ceRequirements,
+          whoNeedsToComply: req.body.whoNeedsToComply,
+          parentSpecification: req.body.parentSpecification,
+          comments: req.body.comments
         })
         // try to save it ..
         .save( { transaction: t } )
@@ -99,9 +106,14 @@ router.post('/', function(req, res) {
           req.body.associatedRegulations.forEach(function(currentValue, index) {
             
             var a = {
-              description: currentValue.description, 
               regulatedBy: currentValue.regulatedBy, 
               citationNumber: currentValue.citationNumber,
+              name: currentValue.name,
+              description: currentValue.description,
+              isTrainingRequired: currentValue.isTrainingRequired,
+              orderText: currentValue.orderText,
+              activityDescription: currentValue.activityDescription,
+              complianceAction: currentValue.complianceAction,
               specificationId: newSpec.id,
               AssociatedRegulationParts: []
             };

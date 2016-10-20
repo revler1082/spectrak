@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(128),
       allowNull: false,
       validate: {
-        len: [1,128]
+        len: [0,128]
       }
     },
     issueDate: {
@@ -39,14 +39,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(4),
       allowNull: false,
       validate: {
-        len: [1,4]
+        len: [0,4]
       }
     },
     subSectionCode: {
       type: DataTypes.STRING(4),
       allowNull: true,
       validate: {
-        len: [1,4]
+        len: [0,4]
       }
     },
     hasDwg: {
@@ -59,7 +59,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(128),
       allowNull: false,
       validate: {
-        len: [1, 128]
+        len: [0, 128]
       }
     },
     isActive: {
@@ -67,7 +67,56 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       validate: {
       }
-    }
+    },
+    author: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+      validate: {
+        len: [0, 128]        
+      }
+    },
+    reviewedBy: {
+      type: DataTypes.STRING(128),
+      allowNull: true,
+      validate: {
+        len: [0, 128]        
+      }
+    },
+    tlcCourse: {
+      type: DataTypes.STRING(16),
+      allowNull: true,
+      validate: {
+        len: [0, 16]        
+      }
+    },
+    ceRequirements: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      validate: {
+        len: [0, 1024]        
+      }
+    },    
+    whoNeedsToComply: {
+      type: DataTypes.STRING(256),
+      allowNull: true,
+      validate: {
+        len: [0, 256]
+      }
+    },    
+    parentSpecification: {
+      type: DataTypes.STRING(16),
+      allowNull: true,
+      validate: {
+        len: [0, 16]        
+      }
+    },
+    comments: {
+      type: DataTypes.STRING(1024),
+      allowNull: true,
+      validate: {
+        len: [0, 1024]        
+      }
+    }    
   }, {
     timestamps: true,
     paranoid: true,
