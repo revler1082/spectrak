@@ -1,4 +1,4 @@
-var seq = require('./data/sequelize');
+//var seq = require('./data/sequelize');
 var models = require('./data/models');
 var express = require('express');
 var router  = express.Router();
@@ -57,7 +57,7 @@ router.post('/', function(req, res) {
 
   setTimeout(function() {
 
-    seq.transaction( function( t ) {
+    models.sequelize.transaction( function( t ) {
 
       var newSpec = null;
       return models.Specification
@@ -170,7 +170,7 @@ router.post('/', function(req, res) {
       if(transactionError.hasOwnProperty('errors')) {
         res.json(transactionError);
       } else {
-        res.json({ errors: [{ path: 'system', message: 'an error occurred when attempting to save to the database' }] });
+        res.json({ errors: [{ path: 'system', message: 'an error occurred when attempting to save to the database ' }] });
       }
     });
   }.bind(this), 2000);

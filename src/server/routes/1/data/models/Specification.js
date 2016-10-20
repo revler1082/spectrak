@@ -15,17 +15,17 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     documentNumber: {
-      type: DataTypes.STRING(8),
+      type: DataTypes.STRING(16),
       allowNull: false,
       validate: {
-        len: [1,8]
+        len: [1,16]
       }
     },
     title: {
-      type: DataTypes.STRING(128),
-      allowNull: false,
+      type: DataTypes.STRING(255),
+      allowNull: true,
       validate: {
-        len: [0,128]
+        len: [0,255]
       }
     },
     issueDate: {
@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     sectionCode: {
       type: DataTypes.STRING(4),
-      allowNull: false,
+      allowNull: true,
       validate: {
         len: [0,4]
       }

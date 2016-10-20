@@ -440,10 +440,10 @@ class SpecificationForm extends React.Component
                 </SelectField>
               </div>
               <div>
-                <TextField id="documentNumber" hintText="10359" floatingLabelText="Document Number" onChange={ this.handleDocumentNumberChange } value={this.state.documentNumber} maxLength="8" />
+                <TextField id="documentNumber" hintText="10359" floatingLabelText="Document Number" onChange={ this.handleDocumentNumberChange } value={this.state.documentNumber} maxLength="16" />
               </div>
               <div>
-                <TextField id="title" hintText="10359" floatingLabelText="Title" onChange={ this.handleTitleChange } value={this.state.title} maxLength="128" />
+                <TextField id="title" hintText="10359" floatingLabelText="Title" onChange={ this.handleTitleChange } value={this.state.title} maxLength="256" />
               </div>
               <div>
                 <DatePicker id="issueDate" hintText="Issue Date" floatingLabelText="Issue Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
@@ -457,7 +457,7 @@ class SpecificationForm extends React.Component
               <div>
                 <Toggle id="dwg" label="Has Drawing?" value={this.state.hasDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
               </div>
-              </Paper>
+              </Paper>np
             <Paper style={{width:'48%', marginLeft:'52%', padding: '1em'}} zDepth={3}>
               <div>
                 <TextField id="author" hintText="Dion Ahmetaj" floatingLabelText="Author" onChange={ (e) => this.setState({ author: e.target.value }) } value={this.state.author} maxLength="128" />

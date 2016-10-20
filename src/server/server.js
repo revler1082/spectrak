@@ -59,6 +59,11 @@ app.use(config.express.siteRoot + 'api/' + apiVersion, router);
 app.use(config.express.siteRoot + 'api/' + apiVersion + '/specifications', specifications);
 app.use(config.express.siteRoot + 'api/' + apiVersion + '/regulations', regulations);
 
+app.get(config.express.siteRoot + 'env/', function (req, res) {
+  res.json(process.env);
+});
+
+
 app.get('/*', function (req, res) {
   res.sendFile(path.resolve(__dirname, '..', 'build', 'www', 'index.html'));
 });
