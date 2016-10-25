@@ -126,6 +126,7 @@ class SpecificationForm extends React.Component
           var record = data.rows[0];
           //if(data.rows[0].issueDate) data.rows[0].issueDate = new Date(data.rows[0].issueDate);
           //this.setState(data.rows[0]);
+
           this.setState({
             type: record.type,
             documentNumber: record.documentNumber,
@@ -133,7 +134,7 @@ class SpecificationForm extends React.Component
             issueDate: new Date(record.issueDate) || '',
             sectionCode: record.sectionCode || '',
             subSectionCode: record.subSectionCode || '',
-            hasDwg: record.hasDwg || '',
+            hasDwg: record.hasDwg || false,
             author: record.author || '',
             reviewedBy: record.reviewedBy || '',
             tlcCourse: record.tlcCourse || '',
@@ -252,12 +253,13 @@ class SpecificationForm extends React.Component
   handleAvailableSpecificationsNewRequest(chosenRequest, index) {
     var updatedAssociatedSpecifications = this.state.associatedSpecifications;
     if(index < 0) {
-      index = this.state.availableSpecifications.findIndex(x=>x.type + '-' + x.documentNumber.toLowerCase() == chosenRequest.toLowerCase());
+      index = this.state.availableSpecifications.findIndex(x => x.documentNumber.toLowerCase() == chosenRequest.toLowerCase());
       if(index >= 0) {
         updatedAssociatedSpecifications.push(this.state.availableSpecifications[index])
         this.setState({ associatedSpecifications: updatedAssociatedSpecifications });
       } else {
-        alert('You can\'t associate this specification to a specification that doesn\'t exist in our database')
+        alert('You can\'t associate this specification to a specification that doesn\'t exist in our database');
+        return false;
       }
     } else {
       updatedAssociatedSpecifications.push(chosenRequest);
@@ -455,7 +457,7 @@ class SpecificationForm extends React.Component
                 <TextField id="sub_section_code" hintText="456" floatingLabelText="Sub-Section Code" value={this.state.subSectionCode} onChange={this.handleSubSectionCodeChange } maxLength="4" />
               </div>                  
               <div>
-                <Toggle id="dwg" label="Has Drawing?" value={this.state.hasDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
+                <Toggle id="dwg" label="Has Drawing?" toggled={this.state.hasDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
               </div>
               </Paper>np
             <Paper style={{width:'48%', marginLeft:'52%', padding: '1em'}} zDepth={3}>
@@ -511,10 +513,7 @@ class SpecificationForm extends React.Component
                       <TextField key={arIdx + '_ar_description'} hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={ar.description} onChange={ (e) => this.handleDescriptionChange(e, arIdx) } maxLength="1024" />
                     </div>
                     <div>
-                      <Toggle key={arIdx + '_ar_is_training_req'} label="Is Training Required?" value={ar.isTrainingRequired} onToggle={ (e, v) => { this.state.AssociatedRegulations[arIdx].isTrainingRequired = v; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations })} } style={{marginTop:16}} style={{width:''}} />
-                    </div>
-                    <div>
-                      <TextField key={arIdx + '_ar_order_text'} hintText="Regulatory or Order Text" floatingLabelText="Order Text" multiLine={true} rows={2} value={ar.orderText} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].orderText = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="256" />
+                      <Toggle key={arIdx + '_ar_is_training_req'} label="Is Training Required?" toggled={ar.isTrainingRequired} onToggle={ (e, v) => { this.state.AssociatedRegulations[arIdx].isTrainingRequired = v; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations })} } style={{marginTop:16}} style={{width:''}} />
                     </div>
                     <div>
                       <TextField key={arIdx + '_ar_activity_description'} hintText="Description of required/prohibited activity?" floatingLabelText="Activty Description" multiLine={true} rows={2} value={ar.activityDescription} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].activityDescription = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="256" />
@@ -529,13 +528,10 @@ class SpecificationForm extends React.Component
                       {
                           ar.AssociatedRegulationParts.map(function(arp, arpIdx) {
                             return(                                                  
-                              <Tab key={arIdx + '_ar_' + arpIdx + '_arp_tab'} label = {arp.section.length > 0 ? arp.section : 'Part ' + (arpIdx + 1)} style={{paddingLeft:'1em', paddingRight:'1em', backgroundColor:'orange'}}>
-                                <RaisedButton label={ 'Delete ' + (arp.section.length > 0 ? arp.section : 'Part ' + (arpIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationPartClick(arIdx, arpIdx) } style={{marginTop:'1em'}} />
+                              <Tab key={arIdx + '_ar_' + arpIdx + '_arp_tab'} label = {'Part ' + (arpIdx + 1)} style={{paddingLeft:'1em', paddingRight:'1em', backgroundColor:'orange'}}>
+                                <RaisedButton label={ 'Delete ' + 'Part ' + (arpIdx + 1) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationPartClick(arIdx, arpIdx) } style={{marginTop:'1em'}} />
                                 <div>
-                                  <TextField key={arIdx + '_ar_' + arpIdx + '_arp_section'} hintText="4.1" floatingLabelText="Section" value={arp.section} onChange={ (e) => this.handleAssociatedRegulationPartSectionChange(e, arIdx, arpIdx) } />
-                                </div>
-                                <div>
-                                  <TextField key={arIdx + '_ar_' + arpIdx + '_arp_description'} hintText="Lorem Ipsum" floatingLabelText="Description" value={arp.description} onChange={ (e) => this.handleAssociatedRegulationPartDescriptionChange(e, arIdx, arpIdx) }  />
+                                  <TextField key={arIdx + '_ar_' + arpIdx + '_order_text'} hintText="Regulatory or Order Text" floatingLabelText="Order Text" multiLine={true} rows={2} value={arp.orderText} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].AssociatedRegulationParts[arpIdx].orderText = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); } } maxLength="1024" />
                                 </div>
                               </Tab>
                             )
@@ -556,7 +552,15 @@ class SpecificationForm extends React.Component
         result = (
           <div>
             <div>
-              <AutoComplete hintText="Document # (ie 103)" dataSource={this.state.availableSpecifications} onUpdateInput={this.handleAvailableSpecificationsUpdate} onNewRequest={this.handleAvailableSpecificationsNewRequest} floatingLabelText="Add Associated Specifications" dataSourceConfig={availableSpecificationsDataSourceConfig} filter={AutoComplete.caseInsensitiveFilter} />
+              <AutoComplete 
+                hintText="Document # (ie 103)" 
+                dataSource={this.state.availableSpecifications} 
+                onUpdateInput={this.handleAvailableSpecificationsUpdate} 
+                onNewRequest={this.handleAvailableSpecificationsNewRequest} 
+                onKeyDown = { (e) => { if(e.keyCode == 13) { e.stopPropagation(); e.preventDefault(); /*return false?*/ } } }
+                floatingLabelText="Add Associated Specifications" 
+                dataSourceConfig={availableSpecificationsDataSourceConfig} 
+                filter={AutoComplete.caseInsensitiveFilter} />
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
               {
                 this.state.associatedSpecifications.map(function(currentValue, index) {

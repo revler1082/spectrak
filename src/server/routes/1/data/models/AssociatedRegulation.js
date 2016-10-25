@@ -7,7 +7,6 @@ module.exports = function(sequelize, DataTypes) {
     name: { type: DataTypes.STRING(64) },
     description: { type: DataTypes.STRING(1024) },
     isTrainingRequired: { type: DataTypes.BOOLEAN, allowNull: true },
-    orderText: { type: DataTypes.STRING(1024), allowNull: true },
     activityDescription: { type: DataTypes.STRING(256), allowNull: true },
     complianceAction: { type: DataTypes.STRING(256), allowNull: true }    
   }, {

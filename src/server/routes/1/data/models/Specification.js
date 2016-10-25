@@ -83,10 +83,10 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     tlcCourse: {
-      type: DataTypes.STRING(16),
+      type: DataTypes.STRING(64),
       allowNull: true,
       validate: {
-        len: [0, 16]        
+        len: [0, 64]        
       }
     },
     ceRequirements: {

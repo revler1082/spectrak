@@ -158,7 +158,7 @@ class SpecificationsTable extends React.Component
                 <TableHeaderColumn>Issue Date</TableHeaderColumn>
                 <TableHeaderColumn>Section Code</TableHeaderColumn>
                 <TableHeaderColumn>Has DWG?</TableHeaderColumn>
-                <TableHeaderColumn>Citation #</TableHeaderColumn>
+                <TableHeaderColumn>Last Updated By</TableHeaderColumn>
                 <TableHeaderColumn></TableHeaderColumn>
               </TableRow>
             </TableHeader>
@@ -172,8 +172,8 @@ class SpecificationsTable extends React.Component
                     <TableRowColumn>{currentValue.title != null ? currentValue.title : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.issueDate != null ? currentValue.issueDate.toString() : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.sectionCode != null ? currentValue.sectionCode : ""}</TableRowColumn>
-                    <TableRowColumn>{currentValue.hasDwg != null ? currentValue.hasDwg : ""}</TableRowColumn>
-                    <TableRowColumn>{currentValue.citationNumber != null ? currentValue.citationNumber : ""}</TableRowColumn>
+                    <TableRowColumn>{currentValue.hasDwg != null ? currentValue.hasDwg.toString() : ""}</TableRowColumn>
+                    <TableRowColumn>{currentValue.createdBy != null ? currentValue.createdBy : ""}</TableRowColumn>
 
                     <TableRowColumn>
                       <Link to={"/spectrak/specifications/" + currentValue.id + '/update'}>

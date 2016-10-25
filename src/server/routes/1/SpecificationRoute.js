@@ -121,8 +121,7 @@ router.post('/', function(req, res) {
             if(currentValue.AssociatedRegulationParts) {
               currentValue.AssociatedRegulationParts.forEach(function(arp, arpIdx) {
                 a.AssociatedRegulationParts.push({
-                  section: arp.section,
-                  description: arp.description
+                  orderText: arp.orderText
                 });
               });
             }
