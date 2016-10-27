@@ -64,7 +64,9 @@ class SpecificationForm extends React.Component
       specificationsSearchXhr: null,
       finished: false,
       specInfoStepIndex: 0,
-      stepIndex: 0 // overall form
+      stepIndex: 0, // overall form
+      
+      ApplicableStandards: []
     };
     
     this.state = $.extend({ }, this.initialState, { id: this.props.id });
@@ -92,6 +94,8 @@ class SpecificationForm extends React.Component
     this.getStepContent = this.getStepContent.bind(this);
     this.handleAddAssociatedRegulationClick = this.handleAddAssociatedRegulationClick.bind(this);
     this.handleRemoveAssociatedRegulationClick = this.handleRemoveAssociatedRegulationClick.bind(this);
+    this.handleAddApplicableStandardClick = this.handleAddApplicableStandardClick.bind(this);
+    this.handleRemoveApplicableStandardClick = this.handleRemoveApplicableStandardClick.bind(this);    
     this.handleAddAssociatedRegulationPartClick = this.handleAddAssociatedRegulationPartClick.bind(this);
     this.handleRemoveAssociatedRegulationPartClick = this.handleRemoveAssociatedRegulationPartClick.bind(this);    
 
@@ -119,6 +123,7 @@ class SpecificationForm extends React.Component
         ias: true,
         iar: true,
         iarp: true,
+        iapst: true,
         _random: Math.random()
       },
       success: function(data) {
@@ -143,7 +148,8 @@ class SpecificationForm extends React.Component
             parentSpecification: record.parentSpecification || '',
             comments: record.comments || '',
             AssociatedRegulations: record.AssociatedRegulations === null ? [] : record.AssociatedRegulations,
-            associatedSpecifications: record.associatedSpecifications === null ? [] : record.associatedSpecifications          
+            associatedSpecifications: record.associatedSpecifications === null ? [] : record.associatedSpecifications,
+            ApplicableStandards: record.ApplicableStandards === null ? [] : record.ApplicableStandards  
           });
         } else {
         }
@@ -341,6 +347,27 @@ class SpecificationForm extends React.Component
       this.setState({ AssociatedRegulations: associatedRegulations });
     }
   }
+  
+  handleAddApplicableStandardClick(e) {
+    var applicableStandards = this.state.ApplicableStandards;
+    //var arCount = associatedRegulations.length;
+    //if(arCount == 0 || associatedRegulations[arCount - 1])
+    applicableStandards.push({
+      "name": "",
+      "citation": "",
+      "code": ""
+    });
+
+    this.setState({ ApplicableStandards: applicableStandards });
+  }
+  
+  handleRemoveApplicableStandardClick(arIdx) {
+    if(arIdx > -1) {
+      var applicableStandards = this.state.ApplicableStandards;      
+      applicableStandards.splice(arIdx, 1);
+      this.setState({ ApplicableStandards: applicableStandards });
+    }
+  }  
     
   handlePrev(e) {
     const {stepIndex} = this.state;
@@ -353,7 +380,7 @@ class SpecificationForm extends React.Component
     
     const { stepIndex } = this.state;
     
-    if(stepIndex == 2) {
+    if(stepIndex == 3) {
       e.preventDefault();
       this.setState({saving: true});
 
@@ -380,7 +407,8 @@ class SpecificationForm extends React.Component
           //regulatedBy: this.state.regulatedBy,
           //description: this.state.description,
           associatedRegulations: this.state.AssociatedRegulations,
-          associatedSpecifications: this.state.associatedSpecifications
+          associatedSpecifications: this.state.associatedSpecifications,
+          applicableStandards: this.state.ApplicableStandards
         },
         success: function(data) {
           this.setState({
@@ -551,6 +579,33 @@ class SpecificationForm extends React.Component
       case 2:
         result = (
           <div>
+            <RaisedButton key={ 'as_add' } label={ 'Add New Applicable Standard' } primary={true} fullWidth={true} onTouchTap={ this.handleAddApplicableStandardClick } />                          
+            <Tabs>
+            {
+              this.state.ApplicableStandards.map(function(as, asIdx) {
+                return(
+                  <Tab key={ asIdx + '_as_tab' } label={ as.name.length > 0 ? as.name : 'Standard ' + (asIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
+                    <RaisedButton key={ asIdx + '_as_del' } label={ 'Delete ' + (as.name.length > 0 ? as.name : 'Standard ' + (asIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveApplicableStandardClick(asIdx) } style={{marginTop:'1em'}} />
+                    <div>
+                      <TextField key={asIdx + '_as_name'} hintText="" floatingLabelText="Name" value={as.name} onChange={ (e) => { this.state.ApplicableStandards[asIdx].name = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="32" />
+                    </div>
+                    <div>
+                      <TextField key={asIdx + '_as_citation'} hintText="In corporate compliance format" floatingLabelText="Citation" multiLine={true} rows={4} value={as.citation} onChange={ (e) => { this.state.ApplicableStandards[asIdx].citation = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="256" />
+                    </div>
+                    <div>
+                      <TextField key={asIdx + '_as_code'} hintText="In natural syntax, using key words or rule/figure #" floatingLabelText="Code" multiLine={true} rows={4} value={as.code} onChange={ (e) => { this.state.ApplicableStandards[asIdx].code = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="256" />
+                    </div>
+                  </Tab>
+                )
+              }, this)
+            }
+            </Tabs>
+          </div>          
+        );
+        break;
+      case 3:
+        result = (
+          <div>
             <div>
               <AutoComplete 
                 hintText="Document # (ie 103)" 
@@ -598,17 +653,18 @@ class SpecificationForm extends React.Component
     const {finished, stepIndex} = this.state;    
 
     return (
-      <div style={{width: '100%', maxWidth: 700, margin: 'auto', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)', background:'white', padding: '1.4em'}}>
+      <div style={{width: '100%', maxWidth: 900, margin: 'auto', boxShadow: '0 2em 4em 0 rgba(0, 0, 0, 0.2), 0 4em 8em 0 rgba(0, 0, 0, 0.19)', background:'white', padding: '1.4em'}}>
         <form>
           <Stepper activeStep={stepIndex}>
             <Step><StepLabel>Specification Information</StepLabel></Step>
             <Step><StepLabel>Associated Regulations</StepLabel></Step>
+            <Step><StepLabel>Applicable Standards</StepLabel></Step>            
             <Step><StepLabel>Referenced Specifications</StepLabel></Step>
           </Stepper>
           {this.getStepContent(stepIndex)}
           <Divider style={{marginTop: '2em', marginBottom:'2em'}} />
           <FlatButton label="Back" disabled={stepIndex === 0} onTouchTap={this.handlePrev} style={{marginRight: 12}} />
-          <RaisedButton label={stepIndex === 2 ? 'Finish' : 'Next'} primary={true} onTouchTap={this.handleNext} disabled={this.state.saving} />          
+          <RaisedButton label={stepIndex === 3 ? 'Finish' : 'Next'} primary={true} onTouchTap={this.handleNext} disabled={this.state.saving} />          
           <LinearProgress mode="indeterminate" style={{display: this.state.saving ? 'block' : 'none', marginTop:'2em' }} />
           <Snackbar open={this.state.snackbarOpen} message="Specification saved" autoHideDuration={4000} onRequestClose={this.handleSnackbarRequestClose} />
         </form>

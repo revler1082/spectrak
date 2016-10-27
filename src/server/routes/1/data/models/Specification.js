@@ -126,6 +126,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         //Specification.belongsToMany(models.Regulation, { as: 'regulations', through: 'SpecificationsRegulations' });
         Specification.hasMany(models.AssociatedRegulation, { foreignKey: 'specificationId' });
+        Specification.hasMany(models.ApplicableStandard, { foreignKey: 'specificationId' });
         Specification.belongsToMany(models.Specification, { as: 'associatedSpecifications', through: 'SpecificationAssociations', foreignKey: 'specificationId' });
       }
     }

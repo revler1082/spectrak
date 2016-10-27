@@ -9,6 +9,7 @@ router.get('/', function(req, res) {
   var whereClause = { isActive: true };
   if(req.query.id) { whereClause.id = req.query.id; }
   if(req.query.ias) { include.push({ model: models.Specification, as: 'associatedSpecifications' }); }
+  if(req.query.iapst) { include.push({ model: models.ApplicableStandard }); }  
   if(req.query.iar) {
     var ar =  { model: models.AssociatedRegulation };
     if(req.query.iarp) { ar.include = models.AssociatedRegulationPart };  
@@ -131,9 +132,23 @@ router.post('/', function(req, res) {
           
           return models.Sequelize.Promise.all(promises);
         })
-        //.then(function(associatedRegulations) {
-
-        //})
+        .then(function() {
+          var promises = []
+          if(!req.body.applicableStandards) req.body.applicableStandards = [];
+          req.body.applicableStandards.forEach(function(currentValue, index) {
+            
+            var a = {
+              name: currentValue.name, 
+              citation: currentValue.citation,
+              code: currentValue.code,
+              specificationId: newSpec.id
+            };
+            
+            promises.push(models.ApplicableStandard.create(a, { transaction: t }));
+          });
+          
+          return models.Sequelize.Promise.all(promises);
+        })
         .then(function() {
           if(req.body.associatedSpecifications && req.body.associatedSpecifications.length > 0) {
             return models.Specification.findAll({
