@@ -157,7 +157,7 @@ class SpecificationsTable extends React.Component
                 <TableHeaderColumn>Title</TableHeaderColumn>
                 <TableHeaderColumn>Issue Date</TableHeaderColumn>
                 <TableHeaderColumn>Section Code</TableHeaderColumn>
-                <TableHeaderColumn>Has DWG?</TableHeaderColumn>
+                <TableHeaderColumn>Is DWG?</TableHeaderColumn>
                 <TableHeaderColumn>Last Updated By</TableHeaderColumn>
                 <TableHeaderColumn></TableHeaderColumn>
               </TableRow>
