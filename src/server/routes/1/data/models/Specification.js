@@ -10,8 +10,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(4),
       allowNull: false,
       validate: {
-        isIn: [['EO', 'EOP', 'B']],
-        len: [1,4]
+        isIn: [['B', 'EO', 'EOP', 'MEP', 'MES', 'OJT', 'QA']],
+        len: [1, 4]
       }
     },
     documentNumber: {
@@ -49,11 +49,21 @@ module.exports = function(sequelize, DataTypes) {
         len: [0,4]
       }
     },
-    hasDwg: {
+    isDwg: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       validate: {
       }
+    },
+    drawingType: {
+      type: DataTypes.INTEGER,
+      allowNull: true      
+    },
+    readOnly: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      validate: {
+      }      
     },
     createdBy: {
       type: DataTypes.STRING(128),

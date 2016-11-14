@@ -10,6 +10,7 @@ import Snackbar from 'material-ui/Snackbar';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Toggle from 'material-ui/Toggle';
+import Slider from 'material-ui/Slider';
 import LinearProgress from 'material-ui/LinearProgress';
 import Chip from 'material-ui/Chip';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -40,7 +41,9 @@ class SpecificationForm extends React.Component
       issueDate: null,
       sectionCode: '',
       subSectionCode: '',
-      hasDwg: false,
+      isDwg: false,
+      drawingType: 1,
+      readOnly: false,
       
       // spec data 2
       author: '',
@@ -139,7 +142,8 @@ class SpecificationForm extends React.Component
             issueDate: new Date(record.issueDate) || '',
             sectionCode: record.sectionCode || '',
             subSectionCode: record.subSectionCode || '',
-            hasDwg: record.hasDwg || false,
+            isDwg: record.isDwg || false,
+            drawingType: record.drawingType || 1,
             author: record.author || '',
             reviewedBy: record.reviewedBy || '',
             tlcCourse: record.tlcCourse || '',
@@ -206,7 +210,7 @@ class SpecificationForm extends React.Component
   
   */
   handleDwgToggle(e, v) {
-    this.setState({ hasDwg: v });
+    this.setState({ isDwg: v });
   };
 
   handleCitationNumberChange(e, arIdx) {
@@ -395,7 +399,9 @@ class SpecificationForm extends React.Component
           title: this.state.title,
           issueDate: this.state.issueDate,
           sectionCode: this.state.sectionCode,
-          hasDwg: this.state.hasDwg,
+          isDwg: this.state.isDwg,
+          drawingType: this.state.drawingType,
+          readOnly: this.state.readOnly,
           author: this.state.author,
           reviewedBy: this.state.reviewedBy,
           tlcCourse: this.state.tlcCourse,
@@ -464,9 +470,13 @@ class SpecificationForm extends React.Component
             <Paper style={{ width: '48%', float: 'left', padding: '1em' }} zDepth={3}>
               <div>
                 <SelectField value={this.state.type} onChange={this.handleTypeChange} floatingLabelText="Type">
+                  <MenuItem value="B" primaryText="B" />                
                   <MenuItem value="EO" primaryText="EO" />
                   <MenuItem value="EOP" primaryText="EOP" />
-                  <MenuItem value="B" primaryText="B" />
+                  <MenuItem value="MEP" primaryText="MEP" />
+                  <MenuItem value="MES" primaryText="MES" />
+                  <MenuItem value="OJT" primaryText="OJT" />
+                  <MenuItem value="QA" primaryText="QA" />                  
                 </SelectField>
               </div>
               <div>
@@ -485,9 +495,16 @@ class SpecificationForm extends React.Component
                 <TextField id="sub_section_code" hintText="456" floatingLabelText="Sub-Section Code" value={this.state.subSectionCode} onChange={this.handleSubSectionCodeChange } maxLength="4" />
               </div>                  
               <div>
-                <Toggle id="dwg" label="Has Drawing?" toggled={this.state.hasDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
+                <Toggle id="dwg" label="Is Drawing?" toggled={this.state.isDwg} onToggle={this.handleDwgToggle} style={{marginTop:16}} />
               </div>
-              </Paper>np
+              <div>
+                <Toggle id="read_only" label="Read Only?" toggled={this.state.readOnly} onToggle={ (e, v) => this.setState({ readOnly: v }) } style={{marginTop:16}} />
+              </div>              
+              <div style={{ marginTop: '1em' }}>
+                <span>Selected Drawing Type is { this.state.drawingType }</span>
+                <Slider min={1} max={9} step={1} defaultValue={1} value={this.state.drawingType} onChange={ (e, v) => this.setState({ drawingType: v }) } />              
+              </div>              
+              </Paper>
             <Paper style={{width:'48%', marginLeft:'52%', padding: '1em'}} zDepth={3}>
               <div>
                 <TextField id="author" hintText="Dion Ahmetaj" floatingLabelText="Author" onChange={ (e) => this.setState({ author: e.target.value }) } value={this.state.author} maxLength="128" />
@@ -523,15 +540,63 @@ class SpecificationForm extends React.Component
             {
               this.state.AssociatedRegulations.map(function(ar, arIdx) {
                 return(
-                  <Tab key={ arIdx + '_ar_tab' } label={ ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
-                    <RaisedButton key={ arIdx + '_ar_del' } label={ 'Delete ' + (ar.citationNumber.length > 0 ? ar.citationNumber : 'Regulation ' + (arIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationClick(arIdx) } style={{marginTop:'1em'}} />
+                  <Tab key={ arIdx + '_ar_tab' } label={ 'Regulation ' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
+                    <RaisedButton key={ arIdx + '_ar_del' } label={ 'Delete ' + ('Regulation ' + (arIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationClick(arIdx) } style={{marginTop:'1em'}} />
                     <div>
-                      <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } maxLength="16" />
+                      <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } maxLength="256" multiLine={true} />
                     </div>
                     <div>
                       <SelectField key={arIdx + '_ar_regulated_by'} value={ar.regulatedBy} onChange={ (e, key, payload) => this.handleRegulatedByChange(e, key, payload, arIdx) } floatingLabelText="Regulated By">
-                        <MenuItem value="PSC" primaryText="PSC" />
-                        <MenuItem value="NESC" primaryText="NESC" />
+                        <MenuItem value="N/A" primaryText="N/A" />                      
+                        <MenuItem value='ACGIH' primaryText='ACGIH' />
+                        <MenuItem value='ANSI' primaryText='ANSI' />
+                        <MenuItem value='API' primaryText='API' />
+                        <MenuItem value='ASME' primaryText='ASME' />
+                        <MenuItem value='ASTM' primaryText='ASTM' />
+                        <MenuItem value='AWS' primaryText='AWS' />
+                        <MenuItem value='BOCA' primaryText='BOCA' />
+                        <MenuItem value='CFTC' primaryText='CFTC' />
+                        <MenuItem value='Coast Guard' primaryText='Coast Guard' />
+                        <MenuItem value='DEC' primaryText='DEC' />
+                        <MenuItem value='DHS' primaryText='DHS' />
+                        <MenuItem value='DOB' primaryText='DOB' />
+                        <MenuItem value='DOE' primaryText='DOE' />
+                        <MenuItem value='DOH' primaryText='DOH' />
+                        <MenuItem value='DOL' primaryText='DOL' />
+                        <MenuItem value='DOT' primaryText='DOT' />
+                        <MenuItem value='EEO' primaryText='EEO' />
+                        <MenuItem value='EPA ' primaryText='EPA ' />
+                        <MenuItem value='FCC' primaryText='FCC' />
+                        <MenuItem value='FERC' primaryText='FERC' />
+                        <MenuItem value='FIRE ' primaryText='FIRE ' />
+                        <MenuItem value='FTC' primaryText='FTC' />
+                        <MenuItem value='IEEE' primaryText='IEEE' />
+                        <MenuItem value='IRS' primaryText='IRS' />
+                        <MenuItem value='NEC' primaryText='NEC' />
+                        <MenuItem value='NEMA' primaryText='NEMA' />
+                        <MenuItem value='NERC' primaryText='NERC' />
+                        <MenuItem value='NFPA' primaryText='NFPA' />
+                        <MenuItem value='NHTSA' primaryText='NHTSA' />
+                        <MenuItem value='NIOSH' primaryText='NIOSH' />
+                        <MenuItem value='NJ Town and Village ' primaryText='NJ Town and Village ' />
+                        <MenuItem value='NJBPU' primaryText='NJBPU' />
+                        <MenuItem value='NPCC ' primaryText='NPCC ' />
+                        <MenuItem value='NRDC' primaryText='NRDC' />
+                        <MenuItem value='NYISO' primaryText='NYISO' />
+                        <MenuItem value='NYS PSC ' primaryText='NYS PSC ' />
+                        <MenuItem value='NYSRC' primaryText='NYSRC' />
+                        <MenuItem value='OAG' primaryText='OAG' />
+                        <MenuItem value='OFFCP' primaryText='OFFCP' />
+                        <MenuItem value='OSHA' primaryText='OSHA' />
+                        <MenuItem value='PAPUC' primaryText='PAPUC' />
+                        <MenuItem value='PJM Interconnection' primaryText='PJM Interconnection' />
+                        <MenuItem value='Police ' primaryText='Police ' />
+                        <MenuItem value='Rockland DOH' primaryText='Rockland DOH' />
+                        <MenuItem value='Rockland Drainage' primaryText='Rockland Drainage' />
+                        <MenuItem value='SEC' primaryText='SEC' />
+                        <MenuItem value='TSA' primaryText='TSA' />
+                        <MenuItem value='UBP' primaryText='UBP' />
+                        <MenuItem value='UL' primaryText='UL' />
                       </SelectField>
                     </div>
                     <div>
@@ -662,7 +727,8 @@ class SpecificationForm extends React.Component
             <Step><StepLabel>Referenced Specifications</StepLabel></Step>
           </Stepper>
           {this.getStepContent(stepIndex)}
-          <Divider style={{marginTop: '2em', marginBottom:'2em'}} />
+          <div style={{clear:'both'}} />
+          <Divider style={{marginTop: '2em', marginBottom:'2em', clear:'both' }} />
           <FlatButton label="Back" disabled={stepIndex === 0} onTouchTap={this.handlePrev} style={{marginRight: 12}} />
           <RaisedButton label={stepIndex === 3 ? 'Finish' : 'Next'} primary={true} onTouchTap={this.handleNext} disabled={this.state.saving} />          
           <LinearProgress mode="indeterminate" style={{display: this.state.saving ? 'block' : 'none', marginTop:'2em' }} />

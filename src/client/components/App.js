@@ -10,6 +10,7 @@ import configs from '../../server/config';
 import { Router, Route, browserHistory, IndexRoute, Link } from 'react-router';
 import $ from 'jquery';
 import RaisedButton from 'material-ui/RaisedButton';
+import AppBar from 'material-ui/AppBar';
 
 var config = configs["development"];
 
@@ -28,7 +29,11 @@ class App extends React.Component
   render() {
     return (
       <MuiThemeProvider muiTheme={getMuiTheme({})}>
-        {this.props.children}
+        <div>
+          <AppBar title="SpecTrak - SPEAR" titleStyle={ { cursor: 'pointer' } } iconStyleLeft={ { display: 'none' } } onTitleTouchTap={ () => browserHistory.push(config.express.siteRoot) } />
+          <hr style={{ color: '#cccccc' }} />
+          {this.props.children}
+        </div>
       </MuiThemeProvider>
     );
   }

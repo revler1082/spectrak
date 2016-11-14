@@ -2,8 +2,8 @@
 module.exports = function(sequelize, DataTypes) {
   var AssociatedRegulation = sequelize.define('AssociatedRegulation', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    citationNumber: { type: DataTypes.STRING(16) },
-    regulatedBy: { type: DataTypes.STRING(4) },
+    citationNumber: { type: DataTypes.STRING(256) },
+    regulatedBy: { type: DataTypes.STRING(32) },
     name: { type: DataTypes.STRING(64) },
     description: { type: DataTypes.STRING(1024) },
     isTrainingRequired: { type: DataTypes.BOOLEAN, allowNull: true },

@@ -172,7 +172,7 @@ class SpecificationsTable extends React.Component
                     <TableRowColumn>{currentValue.title != null ? currentValue.title : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.issueDate != null ? currentValue.issueDate.toString() : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.sectionCode != null ? currentValue.sectionCode : ""}</TableRowColumn>
-                    <TableRowColumn>{currentValue.hasDwg != null ? currentValue.hasDwg.toString() : ""}</TableRowColumn>
+                    <TableRowColumn>{currentValue.isDwg != null ? currentValue.isDwg.toString() : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.createdBy != null ? currentValue.createdBy : ""}</TableRowColumn>
 
                     <TableRowColumn>
