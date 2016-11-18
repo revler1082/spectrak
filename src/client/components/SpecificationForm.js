@@ -540,7 +540,7 @@ class SpecificationForm extends React.Component
             {
               this.state.AssociatedRegulations.map(function(ar, arIdx) {
                 return(
-                  <Tab key={ arIdx + '_ar_tab' } label={ 'Regulation ' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
+                  <Tab key={ arIdx + '_ar_tab' } label={ '' + (arIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
                     <RaisedButton key={ arIdx + '_ar_del' } label={ 'Delete ' + ('Regulation ' + (arIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveAssociatedRegulationClick(arIdx) } style={{marginTop:'1em'}} />
                     <div>
                       <TextField key={arIdx + '_ar_citation_number'} hintText="04-M-0159" floatingLabelText="Citation Number" value={ar.citationNumber} onChange={ (e) => this.handleCitationNumberChange(e, arIdx) } maxLength="256" multiLine={true} />
@@ -575,6 +575,7 @@ class SpecificationForm extends React.Component
                         <MenuItem value='NEC' primaryText='NEC' />
                         <MenuItem value='NEMA' primaryText='NEMA' />
                         <MenuItem value='NERC' primaryText='NERC' />
+                        <MenuItem value='NESC ' primaryText='NESC ' />                        
                         <MenuItem value='NFPA' primaryText='NFPA' />
                         <MenuItem value='NHTSA' primaryText='NHTSA' />
                         <MenuItem value='NIOSH' primaryText='NIOSH' />
@@ -582,8 +583,9 @@ class SpecificationForm extends React.Component
                         <MenuItem value='NJBPU' primaryText='NJBPU' />
                         <MenuItem value='NPCC ' primaryText='NPCC ' />
                         <MenuItem value='NRDC' primaryText='NRDC' />
+                        <MenuItem value='NYC' primaryText='NYC' />                        
                         <MenuItem value='NYISO' primaryText='NYISO' />
-                        <MenuItem value='NYS PSC ' primaryText='NYS PSC ' />
+                        <MenuItem value='NYS PSC' primaryText='NYS PSC' />
                         <MenuItem value='NYSRC' primaryText='NYSRC' />
                         <MenuItem value='OAG' primaryText='OAG' />
                         <MenuItem value='OFFCP' primaryText='OFFCP' />
