@@ -159,6 +159,7 @@ class SpecificationsTable extends React.Component
                 <TableHeaderColumn>Section Code</TableHeaderColumn>
                 <TableHeaderColumn>Is DWG?</TableHeaderColumn>
                 <TableHeaderColumn>Last Updated By</TableHeaderColumn>
+                <TableHeaderColumn>Is Critical</TableHeaderColumn>                
                 <TableHeaderColumn></TableHeaderColumn>
               </TableRow>
             </TableHeader>
@@ -166,7 +167,7 @@ class SpecificationsTable extends React.Component
             {
               this.state.rows.map(function(currentValue, index) {
                 return (
-                  <TableRow key={currentValue.id}>
+                  <TableRow key={currentValue.id} style={{backgroundColor: (currentValue.isCritical ? '#dedeff' : '') }}>
                     <TableRowColumn>{currentValue.type}</TableRowColumn>
                     <TableRowColumn>{currentValue.documentNumber}</TableRowColumn>
                     <TableRowColumn>{currentValue.title != null ? currentValue.title : ""}</TableRowColumn>
@@ -174,7 +175,8 @@ class SpecificationsTable extends React.Component
                     <TableRowColumn>{currentValue.sectionCode != null ? currentValue.sectionCode : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.isDwg != null ? currentValue.isDwg.toString() : ""}</TableRowColumn>
                     <TableRowColumn>{currentValue.createdBy != null ? currentValue.createdBy : ""}</TableRowColumn>
-
+                    <TableRowColumn>{currentValue.isCritical != null ? currentValue.isCritical.toString() : ""}</TableRowColumn>
+                    
                     <TableRowColumn>
                       <Link to={"/spectrak/specifications/" + currentValue.id + '/update'}>
                         <RaisedButton label={ "Edit" } style={{ }} />

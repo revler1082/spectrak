@@ -126,6 +126,12 @@ module.exports = function(sequelize, DataTypes) {
       validate: {
         len: [0, 1024]        
       }
+    },
+    isCritical: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      validate: {
+      }
     }    
   }, {
     timestamps: true,

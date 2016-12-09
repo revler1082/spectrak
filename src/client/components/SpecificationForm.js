@@ -53,6 +53,7 @@ class SpecificationForm extends React.Component
       whoNeedsToComply: '',
       parentSpecification: '',
       comments: '',
+      isCritical: false,
       
       citationNumber: '',
       regulatedBy: '',
@@ -151,6 +152,7 @@ class SpecificationForm extends React.Component
             whoNeedsToComply: record.whoNeedsToComply || '',
             parentSpecification: record.parentSpecification || '',
             comments: record.comments || '',
+            isCritical: record.isCritical || false,            
             AssociatedRegulations: record.AssociatedRegulations === null ? [] : record.AssociatedRegulations,
             associatedSpecifications: record.associatedSpecifications === null ? [] : record.associatedSpecifications,
             ApplicableStandards: record.ApplicableStandards === null ? [] : record.ApplicableStandards  
@@ -409,6 +411,7 @@ class SpecificationForm extends React.Component
           whoNeedsToComply: this.state.whoNeedsToComply,
           parentSpecification: this.state.parentSpecification,
           comments: this.state.comments,
+          isCritical: this.state.isCritical,
           //citationNumber: this.state.citationNumber,
           //regulatedBy: this.state.regulatedBy,
           //description: this.state.description,
@@ -483,10 +486,10 @@ class SpecificationForm extends React.Component
                 <TextField id="documentNumber" hintText="10359" floatingLabelText="Document Number" onChange={ this.handleDocumentNumberChange } value={this.state.documentNumber} maxLength="16" />
               </div>
               <div>
-                <TextField id="title" hintText="10359" floatingLabelText="Title" onChange={ this.handleTitleChange } value={this.state.title} maxLength="256" />
+                <TextField id="title" hintText="10359" floatingLabelText="Full Description" onChange={ this.handleTitleChange } value={this.state.title} maxLength="256" />
               </div>
               <div>
-                <DatePicker id="issueDate" hintText="Issue Date" floatingLabelText="Issue Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
+                <DatePicker id="issueDate" hintText="Effective Date" floatingLabelText="Effective Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
               </div>
               <div>
                 <TextField id="sectionCode" hintText="123" floatingLabelText="Section Code" value={this.state.sectionCode} onChange={this.handleSectionCodeChange } maxLength="4" />
@@ -501,7 +504,7 @@ class SpecificationForm extends React.Component
                 <Toggle id="read_only" label="Read Only?" toggled={this.state.readOnly} onToggle={ (e, v) => this.setState({ readOnly: v }) } style={{marginTop:16}} />
               </div>              
               <div style={{ marginTop: '1em' }}>
-                <span>Selected Drawing Type is { this.state.drawingType }</span>
+                <span>Selected Manual Number is { this.state.drawingType }</span>
                 <Slider min={1} max={9} step={1} defaultValue={1} value={this.state.drawingType} onChange={ (e, v) => this.setState({ drawingType: v }) } />              
               </div>              
               </Paper>
@@ -526,7 +529,10 @@ class SpecificationForm extends React.Component
               </div>
               <div>
                 <TextField id="spec_comments" hintText="" floatingLabelText="Comments" multiLine={true} rows={2} onChange={ (e) => this.setState({ comments: e.target.value }) } value={this.state.comments} maxLength="1024" />
-              </div>              
+              </div>
+              <div>
+                <Toggle id="is_critical" label="Is Critical?" toggled={this.state.isCritical} onToggle={ (e, v) => this.setState({ isCritical: v }) } style={{marginTop:16}} />
+              </div>               
             </Paper>
           </div>
         );
@@ -602,7 +608,7 @@ class SpecificationForm extends React.Component
                       </SelectField>
                     </div>
                     <div>
-                      <TextField key={arIdx + '_ar_name'} hintText="Regulation Name" floatingLabelText="Name" value={ar.name} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].name = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); }  } maxLength="32" />
+                      <TextField key={arIdx + '_ar_name'} hintText="10 CFR Part 431, Subpart K - Distribution Transformers" floatingLabelText="Regulation Short Name" value={ar.name} onChange={ (e) => { this.state.AssociatedRegulations[arIdx].name = e.target.value; this.setState({ AssociatedRegulations: this.state.AssociatedRegulations }); }  } maxLength="32" />
                     </div>
                     <div>
                       <TextField key={arIdx + '_ar_description'} hintText="A short description of what the regulation is about" floatingLabelText="Description" multiLine={true} rows={2} value={ar.description} onChange={ (e) => this.handleDescriptionChange(e, arIdx) } maxLength="1024" />

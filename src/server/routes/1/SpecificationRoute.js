@@ -28,7 +28,8 @@ router.get('/', function(req, res) {
       where: whereClause,
       limit: req.query.limit ? parseInt(req.query.limit) : 10,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
-      include
+      include,
+      order: [ ['updatedAt', 'desc'] ]
     })
     .then(function(specs) {
       res.json(specs);
@@ -80,7 +81,8 @@ router.post('/', function(req, res) {
           ceRequirements: req.body.ceRequirements,
           whoNeedsToComply: req.body.whoNeedsToComply,
           parentSpecification: req.body.parentSpecification,
-          comments: req.body.comments
+          comments: req.body.comments,
+          isCritical: req.body.isCritical
         })
         // try to save it ..
         .save( { transaction: t } )
