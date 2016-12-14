@@ -4,7 +4,8 @@ module.exports = function(sequelize, DataTypes) {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING(32) },
     citation: { type: DataTypes.STRING(256) },
-    code: { type: DataTypes.STRING(256) }    
+    code: { type: DataTypes.STRING(256) },
+    sectionReference: { type: DataTypes.STRING(256) }
   }, {
     timestamps: true,
     paranoid: true,
@@ -19,3 +20,4 @@ module.exports = function(sequelize, DataTypes) {
 
   return ApplicableStandard;
 };
+

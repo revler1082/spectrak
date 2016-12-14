@@ -668,6 +668,9 @@ class SpecificationForm extends React.Component
                     <div>
                       <TextField key={asIdx + '_as_code'} hintText="In natural syntax, using key words or rule/figure #" floatingLabelText="Code" multiLine={true} rows={4} value={as.code} onChange={ (e) => { this.state.ApplicableStandards[asIdx].code = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="256" />
                     </div>
+                    <div>
+                      <TextField key={asIdx + '_as_section_reference'} hintText="" floatingLabelText="Section Reference" multiLine={true} rows={4} value={as.sectionReference} onChange={ (e) => { this.state.ApplicableStandards[asIdx].sectionReference = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="256" />
+                    </div>                    
                   </Tab>
                 )
               }, this)

@@ -145,12 +145,13 @@ router.post('/', function(req, res) {
               name: currentValue.name, 
               citation: currentValue.citation,
               code: currentValue.code,
+              sectionReference: currentValue.sectionReference,
               specificationId: newSpec.id
             };
             
             promises.push(models.ApplicableStandard.create(a, { transaction: t }));
           });
-          
+
           return models.Sequelize.Promise.all(promises);
         })
         .then(function() {
