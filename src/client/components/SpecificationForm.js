@@ -140,7 +140,7 @@ class SpecificationForm extends React.Component
             type: record.type,
             documentNumber: record.documentNumber,
             title: record.title || '',
-            issueDate: new Date(record.issueDate) || '',
+            issueDate: new Date( parseInt(record.issueDate.substr(0, 4)), parseInt(record.issueDate.substr(5, 2)) - 1, parseInt(record.issueDate.substr(8, 2)) ) || '',
             sectionCode: record.sectionCode || '',
             subSectionCode: record.subSectionCode || '',
             isDwg: record.isDwg || false,
@@ -479,7 +479,9 @@ class SpecificationForm extends React.Component
                   <MenuItem value="MEP" primaryText="MEP" />
                   <MenuItem value="MES" primaryText="MES" />
                   <MenuItem value="OJT" primaryText="OJT" />
-                  <MenuItem value="QA" primaryText="QA" />                  
+                  <MenuItem value="QA" primaryText="QA" />
+                  <MenuItem value="CSP" primaryText="CSP" />
+                  <MenuItem value="STOP" primaryText="STOP" />                                    
                 </SelectField>
               </div>
               <div>

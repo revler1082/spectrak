@@ -2,7 +2,7 @@
 module.exports = function(sequelize, DataTypes) {
   var ApplicableStandard = sequelize.define('ApplicableStandard', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING(32) },
+    name: { type: DataTypes.STRING(256) },
     citation: { type: DataTypes.STRING(256) },
     code: { type: DataTypes.STRING(256) },
     sectionReference: { type: DataTypes.STRING(256) }

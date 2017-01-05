@@ -15,7 +15,8 @@ module.exports = {
       password: 'netstorm_ro',
       schema: 'spectrak',
       logging: false,
-      forceSync: false
+      forceSync: false,
+      timezone: 'America/New_York'
     }
   },
   development: {
@@ -34,6 +35,7 @@ module.exports = {
       schema: 'spectrak',
       logging: true,
       forceSync: true,
+      timezone: 'America/New_York',
       initialData: {
         specifications: [
           { type: 'EO', documentNumber: '10359', title: '', issueDate: new Date(), sectionCode: '123', subSectionCode: '123', isDwg: false, createdBy: 'CONED\\AHMEATJD', isActive: false },

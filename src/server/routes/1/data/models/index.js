@@ -17,7 +17,8 @@ var sequelize = new Sequelize(
     define: {
       schema: config.schema
     },
-    logging: config.logging
+    logging: config.logging,
+    timezone: config.timezone
   }
 );
 
