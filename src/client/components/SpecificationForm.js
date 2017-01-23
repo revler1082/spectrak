@@ -524,7 +524,7 @@ class SpecificationForm extends React.Component
                 <TextField id="ce_requirements" hintText="Statement of CE requirements" floatingLabelText="CE Requirements" multiLine={true} rows={2} onChange={ (e) => this.setState({ ceRequirements: e.target.value }) } value={this.state.ceRequirements} maxLength="1024" />
               </div>
               <div>
-                <TextField id="who_needs_to_comply" hintText="Who needs to comply?" floatingLabelText="Compliance People" multiLine={true} rows={2} onChange={ (e) => this.setState({ whoNeedsToComply: e.target.value }) } value={this.state.whoNeedsToComply} maxLength="256" />
+                <TextField id="who_needs_to_comply" hintText="Names.." floatingLabelText="Who Needs to Comply" multiLine={true} rows={2} onChange={ (e) => this.setState({ whoNeedsToComply: e.target.value }) } value={this.state.whoNeedsToComply} maxLength="256" />
               </div>
               <div>
                 <TextField id="parent_spec" hintText="EO10359" floatingLabelText="Parent Specification" onChange={ (e) => this.setState({ parentSpecification: e.target.value }) } value={this.state.parentSpecification} maxLength="16" />
