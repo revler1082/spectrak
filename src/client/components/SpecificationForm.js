@@ -533,7 +533,7 @@ class SpecificationForm extends React.Component
                 <TextField id="spec_comments" hintText="" floatingLabelText="Comments" multiLine={true} rows={2} onChange={ (e) => this.setState({ comments: e.target.value }) } value={this.state.comments} maxLength="1024" />
               </div>
               <div>
-                <Toggle id="is_critical" label="Is Critical?" toggled={this.state.isCritical} onToggle={ (e, v) => this.setState({ isCritical: v }) } style={{marginTop:16}} />
+                <Toggle id="is_critical" label="Is Lead Spec?" toggled={this.state.isCritical} onToggle={ (e, v) => this.setState({ isCritical: v }) } style={{marginTop:16}} />
               </div>               
             </Paper>
           </div>
