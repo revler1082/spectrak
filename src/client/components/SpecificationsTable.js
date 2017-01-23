@@ -23,7 +23,7 @@ class SpecificationsTable extends React.Component
       searchXhr: null,
       processing: true,
       disabled: false,
-      pageSize: 8,
+      pageSize: 12,
       currentPage: 0,
       totalCount: null
     };
@@ -149,7 +149,7 @@ class SpecificationsTable extends React.Component
               </Link>
             </ToolbarGroup>
           </Toolbar>
-          <Table fixedHeader={true} fixedFooter={true} selectable={false} height="32em">
+          <Table fixedHeader={true} fixedFooter={true} selectable={false} height="100%">
             <TableHeader displaySelectAll={false} adjustForCheckbox={false} enableSelectAll={false}>
               <TableRow>
                 <TableHeaderColumn>Type</TableHeaderColumn>

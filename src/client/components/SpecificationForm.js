@@ -491,7 +491,7 @@ class SpecificationForm extends React.Component
                 <TextField id="title" hintText="10359" floatingLabelText="Full Description" onChange={ this.handleTitleChange } value={this.state.title} maxLength="256" />
               </div>
               <div>
-                <DatePicker id="issueDate" hintText="Effective Date" floatingLabelText="Effective Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
+                <DatePicker id="issueDate" hintText="Rev Date" floatingLabelText="Rev Date" value={this.state.issueDate} onChange={ this.handleIssueDateChange } autoOk={true} />
               </div>
               <div>
                 <TextField id="sectionCode" hintText="123" floatingLabelText="Section Code" value={this.state.sectionCode} onChange={this.handleSectionCodeChange } maxLength="4" />
