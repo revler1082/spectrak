@@ -659,8 +659,8 @@ class SpecificationForm extends React.Component
             {
               this.state.ApplicableStandards.map(function(as, asIdx) {
                 return(
-                  <Tab key={ asIdx + '_as_tab' } label={ as.name.length > 0 ? as.name : 'Standard ' + (asIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
-                    <RaisedButton key={ asIdx + '_as_del' } label={ 'Delete ' + (as.name.length > 0 ? as.name : 'Standard ' + (asIdx + 1)) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveApplicableStandardClick(asIdx) } style={{marginTop:'1em'}} />
+                  <Tab key={ asIdx + '_as_tab' } label={ (asIdx + 1) } style={{paddingLeft:'1em',paddingRight:'1em'}}>
+                    <RaisedButton key={ asIdx + '_as_del' } label={ 'Delete ' + (asIdx + 1) } secondary={true} fullWidth={true} onTouchTap={ () => this.handleRemoveApplicableStandardClick(asIdx) } style={{marginTop:'1em'}} />
                     <div>
                       <TextField key={asIdx + '_as_name'} hintText="" floatingLabelText="Name" value={as.name} onChange={ (e) => { this.state.ApplicableStandards[asIdx].name = e.target.value; this.setState({ ApplicableStandards: this.state.ApplicableStandards }); } } maxLength="32" />
                     </div>
